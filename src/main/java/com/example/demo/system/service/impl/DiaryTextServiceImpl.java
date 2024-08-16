@@ -1,0 +1,115 @@
+package com.example.demo.system.service.impl;
+
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.demo.common.vo.Result;
+import com.example.demo.config.HostHolder;
+import com.example.demo.system.entity.DiaryText;
+import com.example.demo.system.mapper.DiaryTextMapper;
+import com.example.demo.system.service.IDiaryTextService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
+
+/**
+ * <p>
+ * 服务实现类
+ * </p>
+ *
+ * @author gaoxianhua
+ * @since 2023-12-26
+ */
+@Service
+public class DiaryTextServiceImpl extends ServiceImpl<DiaryTextMapper, DiaryText> implements IDiaryTextService {
+
+    @Autowired
+    private HostHolder hostHolder;
+
+    /**
+     * 保存个人当天日记，重复就更新
+     * */
+    @Override
+    public Result saveDiaryService(DiaryText diaryText) {
+        String userId = hostHolder.getUser().getId();
+        diaryText.setUserId(userId);
+
+        LambdaUpdateWrapper<DiaryText> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.eq(DiaryText::getUserId, userId).eq(DiaryText::getCreateDate, diaryText.getCreateDate());
+        Boolean isSave = saveOrUpdate(diaryText, updateWrapper);
+
+        if (!isSave) {
+            return Result.fail("保存失败");
+        }
+        return Result.success("保存成功");
+    }
+
+    /**
+     * 获取个人当天日记详情
+     * */
+    @Override
+    public Result getDiaryDetailService(DiaryText diaryText) {
+        String userId = hostHolder.getUser().getId();
+        LambdaQueryWrapper<DiaryText> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(DiaryText::getUserId, userId).eq(DiaryText::getCreateDate, diaryText.getCreateDate());
+        DiaryText data = getOne(queryWrapper);
+
+
+        return Result.success(data, "查询成功");
+    }
+
+    /**
+     * 获取个人当月所有日记时间
+     * */
+    @Override
+    public Result getDiaryListService(DiaryText diaryText) {
+        String userId = hostHolder.getUser().getId();
+        LambdaQueryWrapper<DiaryText> queryWrapper = Wrappers.lambdaQuery();
+
+        LocalDate firstDayOfMonth = diaryText.getCreateDate().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate lastDayOfMonth = diaryText.getCreateDate().with(TemporalAdjusters.lastDayOfMonth());
+
+        queryWrapper.select(DiaryText::getCreateDate).eq(DiaryText::getUserId, userId).between(DiaryText::getCreateDate, firstDayOfMonth.atStartOfDay(),lastDayOfMonth.atTime(23, 59, 59));
+        List<DiaryText> data = list(queryWrapper);
+
+        List<LocalDate> timrList = new ArrayList<>();
+        for (int i = 0; i < data.size(); i++) {
+            LocalDate time = data.get(i).getCreateDate();
+            timrList.add(time);
+        }
+
+        return Result.success(timrList, "查询成功");
+    }
+
+    /**
+     * 获取个人所有日记加起来的积分
+     * */
+    @Override
+    public Result getAllIntegralService() {
+        String userId = hostHolder.getUser().getId();
+        LambdaQueryWrapper<DiaryText> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.select(DiaryText::getIntegral).eq(DiaryText::getUserId, userId);
+        List<DiaryText> list = list(queryWrapper);
+
+        BigDecimal all = BigDecimal.ZERO;
+        //Double all = 0.00;
+        for (int i = 0; i < list.size(); i++) {
+            BigDecimal integral = list.get(i).getIntegral();
+            all = all.add(integral);
+            //all += integral;
+        }
+        BigDecimal money = all.multiply(new BigDecimal("0.01"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("integral", all);
+        data.put("dayNum", list.size());
+        data.put("money", money);
+        return Result.success(data);
+    }
+}

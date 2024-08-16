@@ -1,0 +1,73 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    username: root
+    password: gxh151
+    url: jdbc:mysql://localhost:3306/diary
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  redis:
+    port: 6379
+    host: localhost
+  servlet:
+    multipart:
+      max-file-size: 10MB
+logging:
+  level:
+    com.example.demo: debug
+
+minio:
+  #endpoint: http://minio.free.idcfengye.com
+  endpoint: http://127.0.0.1:9000
+  accessKey: wiv6icYCmi2w8vgZ
+  secretKey: jy2ZmZnGvXwi3ihkcmjvbPWzjHHDKacc
+  bucketName: diary
+
+file:
+  local:
+    normal: E:\upload\file\image\normal\
+    admin: E:\upload\file\image\admin\
+    image: E:\upload\file\image\
+    video: E:\upload\file\video\
+
+tencent:
+  SECRET_ID: AKIDiMAGPdlyFqUMHBCb2b4UmroaDgHBIG0W
+  SECRET_KEY: RgkmcMxLexAAUdeYM3d5KL8nHYdt2BWy
+baidu:
+  API_KEY: Yj0MFhZv1V8yqq4vnoESrEHr
+  SECRET_KEY: BogGBy0YQxJKR7eMKMrccRmwU2gPM2Zn
+
+http:
+  amap:
+    location:
+      host: https://restapi.amap.com
+      port: 3306
+      path:
+        regeo: /v3/geocode/regeo
+    key: dad13b8d263bf1ed3df0bb0cf0cae068
+  hxhApi:
+    location:
+      host: https://api.vvhan.com
+      path:
+        musicList: /api/rand.music
+        music: /api/music
+        acgimg: /api/wallpaper/acg
+        girl: /api/wallpaper/pcGirl
+        sao: /api/text/sexy
+        ian: /api/ian/rand
+        joke: /api/text/joke
+        love: /api/text/love
+        moyu: /api/moyu
+        zhichang: /api/zhichang
+        horoscope: /api/horoscope
+        weather: /api/weather
+        qrcode: /api/qr
+        translate: /api/fy
+        tiktokHot: /api/hotlist/douyinHot
+        mobileGirl: /api/wallpaper/mobileGirl
+#web:
+#  resources:
+#    static-locations:file: D:\file
