@@ -1,4 +1,4 @@
-package com.example.demo.system.service.impl;
+package com.example.demo.config;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Component
 @Slf4j
 @ServerEndpoint("/websocket/{userId}")
-public class WebSocketServer {
+public class MyWebSocketEndpoint {
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
     /**
@@ -23,7 +23,7 @@ public class WebSocketServer {
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
     //虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
     //  注：底下WebSocket是当前类名
-    private static CopyOnWriteArraySet<WebSocketServer> webSockets =new CopyOnWriteArraySet<>();
+    private static CopyOnWriteArraySet<MyWebSocketEndpoint> webSockets =new CopyOnWriteArraySet<>();
     // 用来存在线连接用户信息
     private static ConcurrentHashMap<String,Session> sessionPool = new ConcurrentHashMap<String,Session>();
     /**
@@ -73,7 +73,7 @@ public class WebSocketServer {
     // 此为广播消息
     public static void sendAllMessage(String message) {
         log.info("【websocket消息】广播消息:"+message);
-        for(WebSocketServer webSocket : webSockets) {
+        for(MyWebSocketEndpoint webSocket : webSockets) {
             try {
                 if(webSocket.session.isOpen()) {
                     webSocket.session.getAsyncRemote().sendText(message);

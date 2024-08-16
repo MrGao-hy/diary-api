@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import com.alibaba.fastjson2.JSON;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -13,25 +12,27 @@ import java.io.IOException;
 @WebFilter(filterName = "myFilter")
 public class HttpFilter implements Filter {
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        // Set CORS headers
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, HEAD");
         response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "*");
-        response.setHeader("Content-type", "image/jpeg");
-        //response.setHeader("Access-Control-Allow-Credentials", "true");
-        if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) servletRequest).getMethod())) {
-            response.setStatus(200);
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
-        // 调用下一个Filter或Servlet
+
+        // Proceed with the next filter or servlet
         filterChain.doFilter(servletRequest, servletResponse);
-        ((HttpServletResponse) servletResponse).setStatus(200);
     }
 
     @Override
