@@ -248,8 +248,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         LambdaQueryWrapper<Users> wrapper = new LambdaQueryWrapper<>();
 
         wrapper.like(!StringUtils.isEmpty(users.getUserName()), Users::getUserName, users.getUserName());
-        wrapper.likeRight(!StringUtils.isEmpty(users.getPhone()), Users::getPhone, users.getPhone());
-        wrapper.likeRight(!StringUtils.isEmpty(users.getEmit()), Users::getEmit, users.getEmit());
+        wrapper.like(!StringUtils.isEmpty(users.getPhone()), Users::getPhone, users.getPhone());
+        wrapper.like(!StringUtils.isEmpty(users.getEmit()), Users::getEmit, users.getEmit());
         wrapper.like(!StringUtils.isEmpty(users.getIdCard()), Users::getIdCard, users.getIdCard());
         wrapper.eq(!StringUtils.isEmpty(users.getSex()), Users::getSex, users.getSex());
 

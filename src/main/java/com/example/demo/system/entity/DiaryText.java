@@ -48,7 +48,7 @@ public class DiaryText implements Serializable {
     private BigDecimal integral;
 
     @ApiModelProperty("创建时间")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate createDate;
 
     @ApiModelProperty("内容")

@@ -4,7 +4,7 @@ spring:
   datasource:
     username: root
     password: gxh151
-    url: jdbc:mysql://localhost:3306/diary
+    url: jdbc:mysql://localhost:3306/diary?characterEncoding=utf-8
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,6 +15,8 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
+  main:
+    allow-circular-references: true
 logging:
   level:
     com.example.demo: debug

@@ -54,8 +54,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         patterns.add("/user/register");
         patterns.add("/");
         patterns.add("/request/**");
-        patterns.add("/video/**");
-        patterns.add("/image/**");
+        patterns.add("/file/diary/**");
         patterns.add("/error");
         registration.excludePathPatterns(patterns); //添加不拦截路径
         registration.order(Ordered.HIGHEST_PRECEDENCE); //设置拦截器的顺序

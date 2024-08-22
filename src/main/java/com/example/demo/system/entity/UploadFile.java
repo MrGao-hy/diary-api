@@ -45,7 +45,7 @@ public class UploadFile implements Serializable {
     private String type;
 
     @ApiModelProperty("文件大小")
-    private Object size;
+    private String size;
 
     @ApiModelProperty("上传人")
     private String uploader;

@@ -1,5 +1,6 @@
 package com.example.demo.system.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.demo.common.vo.Result;
 import com.example.demo.config.HostHolder;
@@ -13,11 +14,19 @@ import com.example.demo.utils.TimeFormatConversionUtil;
 import io.minio.MinioClient;
 import io.minio.errors.*;
 import io.minio.policy.PolicyType;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.xmlpull.v1.XmlPullParserException;
+
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -40,6 +49,14 @@ public class UploadFileServiceImpl extends ServiceImpl<UploadFileMapper, UploadF
 
     private int maxSize = 10;
 
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder){
+        return builder.build();
+    }
+
+
+    @Autowired
+    private RestTemplate restTemplate;
     @Autowired
     private UploadFileMapper uploadFileMapper;
     @Autowired
@@ -48,7 +65,6 @@ public class UploadFileServiceImpl extends ServiceImpl<UploadFileMapper, UploadF
     private HostHolder hostHolder;
     @Autowired
     private Constant constant;
-
     @Autowired
     private MinioConfig minioConfig;
 
@@ -109,7 +125,7 @@ public class UploadFileServiceImpl extends ServiceImpl<UploadFileMapper, UploadF
             filePath = type + "/" + sdf.format(new Date()) + "/" + fileName;
             minioClient.putObject(minioConfig.getBucketName(),filePath,file.getInputStream(),file.getContentType());
             // 图片/视频地址
-            url = minioConfig.getEndpoint()+"/"+minioConfig.getBucketName()+"/"+filePath;
+            url = "/file"+minioConfig.getBucketName()+"/"+filePath;
 
 
             UploadFile uploadFile = new UploadFile();
@@ -198,6 +214,35 @@ public class UploadFileServiceImpl extends ServiceImpl<UploadFileMapper, UploadF
             return "删除失败" + e.getMessage();
         }
         return "删除成功";
+    }
+
+    public ResponseEntity<ByteArrayResource> imageUrlService(String type, String time, String name) {
+        try {
+
+            String imageUrl = "http://127.0.0.1:9000/diary/" + type + "/" + time + "/" + name;
+            // 使用RestTemplate获取图片字节数据
+            byte[] imageBytes = restTemplate.getForObject(imageUrl, byte[].class);
+            // 将字节数据封装为Resource
+            ByteArrayResource resource = new ByteArrayResource(imageBytes);
+
+            // 设置响应头
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"a.jpg\"");
+            // 注意：这里应该根据实际的图片类型来设置Content-Type
+            MediaType mediaType;
+            if(type.equals("image")) {
+                mediaType = MediaType.IMAGE_JPEG;
+            } else {
+                mediaType = MediaType.parseMediaType("video/mp4");
+            }
+            // 返回图片资源
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(mediaType) // 或者使用MediaType.parseMediaType(headers.getFirst(HttpHeaders.CONTENT_TYPE))
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
 

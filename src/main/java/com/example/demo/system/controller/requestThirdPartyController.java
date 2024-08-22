@@ -155,20 +155,6 @@ public class requestThirdPartyController {
             return Result.fail(30003, "转化失败:" + e.getMessage());
         }
     }
-    public static String convertBytesToBase64(byte[] imageBytes) {
-        return Base64.getEncoder().encodeToString(imageBytes);
-    }
-    public static String convertImageToBase64(InputStream inputStream) throws IOException {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                baos.write(buffer, 0, bytesRead);
-            }
-            byte[] bytes = baos.toByteArray();
-            return Base64.getEncoder().encodeToString(bytes);
-        }
-    }
 
     @ApiOperation(value = "中英翻译")
     @GetMapping("/translate")
