@@ -50,6 +50,7 @@ public class ClassApiConfig {
         private String translate;
         private String tiktokHot;
         private String mobileGirl;
+        private String dailyEnglish;
     }
 
     @Data

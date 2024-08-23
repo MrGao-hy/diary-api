@@ -70,6 +70,7 @@ http:
         translate: /api/fy
         tiktokHot: /api/hotlist/douyinHot
         mobileGirl: /api/wallpaper/mobileGirl
+        dailyEnglish: /api/dailyEnglish
 #web:
 #  resources:
 #    static-locations:file: D:\file

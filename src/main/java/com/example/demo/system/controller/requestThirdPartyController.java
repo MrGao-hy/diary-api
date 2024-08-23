@@ -156,11 +156,22 @@ public class requestThirdPartyController {
         }
     }
 
+    @ApiOperation(value = "每日励志英语")
+    @GetMapping("/english")
+    public Result dailyEnglishApi() {
+        JSONObject data = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getDailyEnglish());
+        if(data.getBoolean("success")) {
+            return Result.success(data.get("data"));
+        } else {
+            return Result.fail(50000, "第三方接口问题");
+        }
+    }
+
     @ApiOperation(value = "中英翻译")
     @GetMapping("/translate")
     public Result translateApi(@RequestParam String content) {
-        JSONObject date = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getTranslate() + "?text=" + content);
-        return Result.success(date);
+        JSONObject data = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getTranslate() + "?text=" + content);
+        return Result.success(data);
     }
 
     @ApiOperation(value = "ai小姐姐聊天")
