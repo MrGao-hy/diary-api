@@ -125,7 +125,7 @@ public class UploadFileServiceImpl extends ServiceImpl<UploadFileMapper, UploadF
             filePath = type + "/" + sdf.format(new Date()) + "/" + fileName;
             minioClient.putObject(minioConfig.getBucketName(),filePath,file.getInputStream(),file.getContentType());
             // 图片/视频地址
-            url = "/file"+minioConfig.getBucketName()+"/"+filePath;
+            url = "/file/"+minioConfig.getBucketName()+"/"+filePath;
 
 
             UploadFile uploadFile = new UploadFile();

@@ -17,11 +17,22 @@ import org.springframework.stereotype.Component;
 public class ClassApiConfig {
     private Amap amap;
     private HxhApi hxhApi;
+    private NetEaseCloudMusicApi netEaseCloudMusicApi;
 
     @Data
     public static class Amap {
         private Location location;
         private String key;
+    }
+
+    @Data
+    public static class HxhApi {
+        private Location location;
+    }
+
+    @Data
+    public static class NetEaseCloudMusicApi {
+        private Location location;
     }
 
     @Data
@@ -34,8 +45,6 @@ public class ClassApiConfig {
     @Data
     public static class Path {
         private String regeo;
-        private String musicList;
-        private String music;
         private String acgimg;
         private String girl;
         private String sao;
@@ -51,11 +60,18 @@ public class ClassApiConfig {
         private String tiktokHot;
         private String mobileGirl;
         private String dailyEnglish;
-    }
 
-    @Data
-    public static class HxhApi {
-        private Location location;
+        private String musicList;
+        private String classify;
+        private String hot;
+        private String music;
+        private String search;
+        private String searchHot;
+        private String lyric;
+        private String list;
+        private String detail;
+        private String mp3;
+        private String canPlay;
     }
 
 }

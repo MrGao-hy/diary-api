@@ -50,12 +50,25 @@ http:
       path:
         regeo: /v3/geocode/regeo
     key: dad13b8d263bf1ed3df0bb0cf0cae068
+  netEaseCloudMusicApi:
+    location:
+      host: http://127.0.0.1:3000
+      path:
+        hot: /playlist/hot
+        classify: /playlist/catlist
+        search: /search
+        searchHot: /search/hot
+        lyric: /lyric
+        detail: /song/detail
+        list: /playlist/track/all
+        mp3: /song/url/v1
+        canPlay: /check/music
   hxhApi:
     location:
       host: https://api.vvhan.com
       path:
         musicList: /api/rand.music
-        music: /api/music
+        music: /api/wyMusic
         acgimg: /api/wallpaper/acg
         girl: /api/wallpaper/pcGirl
         sao: /api/text/sexy

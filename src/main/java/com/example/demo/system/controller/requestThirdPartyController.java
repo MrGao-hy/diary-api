@@ -29,6 +29,111 @@ public class requestThirdPartyController {
     @Autowired
     private ClassApiConfig api;
 
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+
+    @ApiOperation(value = "热门歌单分类接口")
+    @GetMapping("/music/hotClass")
+    public Result getHotClassApi() throws JsonProcessingException {
+
+        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getHot();
+        JSONObject music = getWord(url);
+
+        if (music.getInteger("code") == 200) {
+            return Result.success(music.getJSONArray("tags"));
+        }
+        return Result.fail(50000, "第三方接口请求错误");
+    }
+
+    @ApiOperation(value = "歌单分类接口")
+    @GetMapping("/music/class")
+    public Result getAllClassApi() {
+
+        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getClassify();
+        JSONObject music = getWord(url);
+
+        if (music.getInteger("code") == 200) {
+            return Result.success(music.getJSONArray("sub"));
+        }
+        return Result.fail(50000, "第三方接口请求错误");
+    }
+
+    @ApiOperation(value = "歌单列表接口")
+    @GetMapping("/music/list")
+    public Result getSongListApi(int id, int page, int size) {
+
+        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getList() + "?id=" + id + "&offset=" + (page - 1) * size + "&limit=" + size;
+        JSONObject music = getWord(url);
+
+        if (music.getInteger("code") == 200) {
+            return Result.success(music.getJSONArray("songs"));
+        }
+        return Result.fail(50000, "第三方接口请求错误");
+    }
+
+    @ApiOperation(value = "判断歌曲能播放吗")
+    @GetMapping("/song/can/play")
+    public Result judgeSongMp3CanPlayApi(int id) {
+
+        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getCanPlay() + "?id=" + id;
+        JSONObject music = getWord(url);
+
+        if (music.getBoolean("success")) {
+            return Result.success(music.getBoolean("success"), music.getString("message"));
+        }
+        return Result.fail(40003, music.getString("message"));
+    }
+
+    @ApiOperation(value = "获取歌曲url接口")
+    @GetMapping("/song/mp3")
+    public Result getSongMp3Api(int id, String level) {
+
+        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getMp3() + "?id=" + id + "&level=" + level;
+        JSONObject music = getWord(url);
+
+        if (music.getInteger("code") == 200) {
+            return Result.success(music.getJSONArray("data"));
+        }
+        return Result.fail(50000, "第三方接口请求错误");
+    }
+
+    @ApiOperation(value = "歌曲详情接口")
+    @GetMapping("/song/detail")
+    public Result getSongDetailApi(int id) {
+
+        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getDetail() + "?ids=" + id;
+        JSONObject music = getWord(url);
+
+        if (music.getInteger("code") == 200) {
+            return Result.success(music.getJSONArray("songs"));
+        }
+        return Result.fail(50000, "第三方接口请求错误");
+    }
+
+    @ApiOperation(value = "获取歌词接口")
+    @GetMapping("/song/lyric")
+    public Result getSongLyricApi(int id) {
+
+        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getLyric() + "?id=" + id;
+        JSONObject music = getWord(url);
+
+        if (music.getInteger("code") == 200) {
+            return Result.success(music.getJSONObject("lrc").getString("lyric"), "");
+        }
+        return Result.fail(50000, "第三方接口请求错误");
+    }
+
+    @ApiOperation(value = "网易云搜索接口")
+    @GetMapping("/music/search")
+    public Result searchMusicList(String keywords) {
+
+        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getSearch() + "?keywords=" + keywords;
+        JSONObject music = getWord(url);
+
+        if (music.getInteger("code") == 200) {
+            return Result.success(music.getJSONObject("result").getJSONArray("songs"));
+        }
+        return Result.fail(50000, "第三方接口请求错误");
+    }
 
     @ApiOperation(value = "网易云音乐列表")
     @GetMapping("/musicList")
@@ -44,13 +149,13 @@ public class requestThirdPartyController {
     }
 
     @ApiOperation(value = "网易云音乐详情")
-    @GetMapping("/musicOnce")
-    public Result getMusicOnce(String id) {
+    @GetMapping("/music/sj")
+    public Result getMusicOnce(String type) {
 
-        String url = api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getMusic() + "?type=song&media=netease&id=" + id;
+        String url = api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getMusic() + "/" + type + "?type=json";
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         String json = HttpClientConfig.sendGetRequest(url, params);
-        JSONObject data = JSONObject.parseObject(json);
+        JSONObject data = JSONObject.parseObject(json).getJSONObject("info");
 
         return Result.success(data);
     }
@@ -121,8 +226,8 @@ public class requestThirdPartyController {
         dataList.add(fish);
 
         // 摸鱼人日历
-        JSONObject laborer = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getZhichang() + "?type=json");
-        dataList.add(laborer);
+//        JSONObject laborer = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getZhichang() + "?type=json");
+//        dataList.add(laborer);
 
         return Result.success(dataList);
     }
