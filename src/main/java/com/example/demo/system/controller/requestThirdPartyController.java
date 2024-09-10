@@ -31,135 +31,6 @@ public class requestThirdPartyController {
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 
-    @ApiOperation(value = "热门歌单分类接口")
-    @GetMapping("/music/hotClass")
-    public Result getHotClassApi() throws JsonProcessingException {
-
-        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getHot();
-        JSONObject music = getWord(url);
-
-        if (music.getInteger("code") == 200) {
-            return Result.success(music.getJSONArray("tags"));
-        }
-        return Result.fail(50000, "第三方接口请求错误");
-    }
-
-    @ApiOperation(value = "歌单分类接口")
-    @GetMapping("/music/class")
-    public Result getAllClassApi() {
-
-        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getClassify();
-        JSONObject music = getWord(url);
-
-        if (music.getInteger("code") == 200) {
-            return Result.success(music.getJSONArray("sub"));
-        }
-        return Result.fail(50000, "第三方接口请求错误");
-    }
-
-    @ApiOperation(value = "歌单列表接口")
-    @GetMapping("/music/list")
-    public Result getSongListApi(int id, int page, int size) {
-
-        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getList() + "?id=" + id + "&offset=" + (page - 1) * size + "&limit=" + size;
-        JSONObject music = getWord(url);
-
-        if (music.getInteger("code") == 200) {
-            return Result.success(music.getJSONArray("songs"));
-        }
-        return Result.fail(50000, "第三方接口请求错误");
-    }
-
-    @ApiOperation(value = "判断歌曲能播放吗")
-    @GetMapping("/song/can/play")
-    public Result judgeSongMp3CanPlayApi(int id) {
-
-        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getCanPlay() + "?id=" + id;
-        JSONObject music = getWord(url);
-
-        if (music.getBoolean("success")) {
-            return Result.success(music.getBoolean("success"), music.getString("message"));
-        }
-        return Result.fail(40003, music.getString("message"));
-    }
-
-    @ApiOperation(value = "获取歌曲url接口")
-    @GetMapping("/song/mp3")
-    public Result getSongMp3Api(int id, String level) {
-
-        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getMp3() + "?id=" + id + "&level=" + level;
-        JSONObject music = getWord(url);
-
-        if (music.getInteger("code") == 200) {
-            return Result.success(music.getJSONArray("data"));
-        }
-        return Result.fail(50000, "第三方接口请求错误");
-    }
-
-    @ApiOperation(value = "歌曲详情接口")
-    @GetMapping("/song/detail")
-    public Result getSongDetailApi(int id) {
-
-        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getDetail() + "?ids=" + id;
-        JSONObject music = getWord(url);
-
-        if (music.getInteger("code") == 200) {
-            return Result.success(music.getJSONArray("songs"));
-        }
-        return Result.fail(50000, "第三方接口请求错误");
-    }
-
-    @ApiOperation(value = "获取歌词接口")
-    @GetMapping("/song/lyric")
-    public Result getSongLyricApi(int id) {
-
-        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getLyric() + "?id=" + id;
-        JSONObject music = getWord(url);
-
-        if (music.getInteger("code") == 200) {
-            return Result.success(music.getJSONObject("lrc").getString("lyric"), "");
-        }
-        return Result.fail(50000, "第三方接口请求错误");
-    }
-
-    @ApiOperation(value = "网易云搜索接口")
-    @GetMapping("/music/search")
-    public Result searchMusicList(String keywords) {
-
-        String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getSearch() + "?keywords=" + keywords;
-        JSONObject music = getWord(url);
-
-        if (music.getInteger("code") == 200) {
-            return Result.success(music.getJSONObject("result").getJSONArray("songs"));
-        }
-        return Result.fail(50000, "第三方接口请求错误");
-    }
-
-    @ApiOperation(value = "网易云音乐列表")
-    @GetMapping("/musicList")
-    public Result getMusicList(String sort) throws JsonProcessingException {
-
-        String url = api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getMusicList() + "?type=all&sort=" + sort;
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        String json = HttpClientConfig.sendGetRequest(url, params);
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map[] array = objectMapper.readValue(json, Map[].class);
-
-        return Result.success(array);
-    }
-
-    @ApiOperation(value = "网易云音乐详情")
-    @GetMapping("/music/sj")
-    public Result getMusicOnce(String type) {
-
-        String url = api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getMusic() + "/" + type + "?type=json";
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        String json = HttpClientConfig.sendGetRequest(url, params);
-        JSONObject data = JSONObject.parseObject(json).getJSONObject("info");
-
-        return Result.success(data);
-    }
-
     @ApiOperation(value = "首页轮播图")
     @GetMapping("/swiper")
     public Result getSwiperImage() {
@@ -246,21 +117,6 @@ public class requestThirdPartyController {
         return Result.success(data);
     }
 
-    @ApiOperation(value = "获取二维码")
-    @GetMapping("/qrcode")
-    public Result createQrcodeApi(@RequestParam String content) {
-        String url = api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getQrcode() + "?text=" + content;
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        String  inputStream = HttpClientConfig.sendGetRequest(url, params);
-
-        try {
-//            String base64Image = convertBytesToBase64(inputStream);
-            return Result.success("二维码生成成功",inputStream);
-        } catch (Exception e) {
-            return Result.fail(30003, "转化失败:" + e.getMessage());
-        }
-    }
-
     @ApiOperation(value = "每日励志英语")
     @GetMapping("/english")
     public Result dailyEnglishApi() {
@@ -320,9 +176,9 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "抖音视频排行榜")
     @GetMapping("/tiktok")
-    public Result getTikTokList(String type) {
+    public Result getTikTokList(String type, int current, int size) {
 
-        String url = "https://apis.juhe.cn/fapig/douyin/billboard?key=7002fe9fc4bb5e129204f87d92c2f395&size=50&offset=1&type=" + type;
+        String url = "https://apis.juhe.cn/fapig/douyin/billboard?key=7002fe9fc4bb5e129204f87d92c2f395&size=" + size + "&offset=" + size * current + "&type=" + type;
         JSONObject video = getWord(url);
 
         if (video.getInteger("error_code") == 0) {
@@ -344,9 +200,9 @@ public class requestThirdPartyController {
     }
 
     @ApiOperation(value = "抖音关键字搜索")
-    @GetMapping("/tiktok/keyword")
+    @GetMapping("/tiktok/search/keyword")
     public Result searchKeywordVideo(String keyword) {
-        String url = "https://api.pearktrue.cn/api/dy/keylead/?keyword=" + keyword;
+        String url = "http://suggestion.baidu.com/su?wd=" + keyword;
         JSONObject video = getWord(url);
 
         if (video.getInteger("code") == 200) {
@@ -378,7 +234,11 @@ public class requestThirdPartyController {
     public Result getBeautifulWomanApi() {
         String url = "https://tucdn.wpon.cn/api-girl/index.php?wpon=json";
         JSONObject video = getWord(url);
-        return Result.success(video.getString("mp4"), "请求成功");
+        if(video.getInteger("result").equals(200)) {
+            return Result.success(video.getString("mp4"));
+        } else {
+            return Result.fail(50000, "第三方接口有误");
+        }
     }
 
     @ApiOperation(value = "解析抖音视频")
