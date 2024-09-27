@@ -2,8 +2,6 @@ package com.example.demo.config;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
@@ -37,6 +35,7 @@ public class MyWebSocketEndpoint {
             webSockets.add(this);
             sessionPool.put(userId, session);
             log.info("【websocket消息】有新的连接，总数为:"+webSockets.size());
+            sendAllMessage("房间总人数(" + webSockets.size() + ")");
         } catch (Exception e) {
         }
     }
@@ -49,6 +48,7 @@ public class MyWebSocketEndpoint {
             webSockets.remove(this);
             sessionPool.remove(this.userId);
             log.info("【websocket消息】连接断开，总数为:"+webSockets.size());
+            sendAllMessage("房间总人数(" + webSockets.size() + ")");
         } catch (Exception e) {
         }
     }
@@ -59,7 +59,10 @@ public class MyWebSocketEndpoint {
      */
     @OnMessage
     public void onMessage(String message) {
+
         log.info("【websocket消息】收到客户端消息:"+message);
+        // 群聊消息
+        sendAllMessage(message);
     }
     /** 发送错误时的处理
      * @param session

@@ -3,6 +3,7 @@ package com.example.demo.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
@@ -132,6 +133,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         // 放在data中返回给前端
         Map<Object, String> data = new HashMap<>();
         data.put("token", token);
+        data.put("salt", salt);
 
 
         return Result.success(data, "登录成功");
@@ -230,7 +232,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      * 分页查询所有用户信息
      * */
     public Result getUserListService(Page<Users> page) {
-        LambdaQueryWrapper wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<Users> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(Users::getBirthDate);
         Page<Users> usersList = page(page, wrapper);
         for (Users item : usersList.getRecords()) {
             UserRole userRole = new UserRole();
@@ -301,7 +304,6 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 new Headers("签名", "signature"),
                 new Headers("生日", "birthDate"),
                 new Headers("头像", "avatar"),
-                new Headers("年龄", "age"),
                 new Headers("性别", "sex"),
                 new Headers("学校", "school"),
                 new Headers("学历", "education"),
@@ -310,7 +312,6 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 new Headers("地址", "address"),
                 new Headers("注册时间", "createTime")
         };
-//        {"userName", "idCard", "phone", "emit", "signature", "birthDate", "avatar", "age", "sex", "school", "education", "major", "constellation", "address", "createTime"}
         // 导出文件路径
         String fileName = "user.xlsx";
         // 调用服务导出数据
@@ -353,8 +354,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         payload.put("date", new Date().toString());
         String token = JWTUtils.getToken(payload);
 
+        Map<String, String> data = new HashMap<>();
+        data.put("token", token);
+
         if (result) {
-            return Result.success("修改密码成功");
+            return Result.success(data, "修改密码成功");
         } else {
             return Result.fail("修改密码失败");
         }

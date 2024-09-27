@@ -23,16 +23,15 @@ public class ExcelExportServiceImpl implements IExcelExportService {
         // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short
         Row headerRow = sheet.createRow(0);
 
-
         for (int i = 0; i < headers.length; i++) {
             Cell headerCell = headerRow.createCell(i);
             headerCell.setCellValue(headers[i].getLabel());
         }
 
-        // 填充数据
-        int rowNum = 1;
+        // 第四步，填充数据
+        int dataNum = 1;
         for (Object data : dataList) {
-            Row row = sheet.createRow(rowNum++);
+            Row row = sheet.createRow(dataNum++);
             // 假设data是一个Map，包含了要导出的字段和值
             if (data instanceof Map) {
                 Map<?, ?> dataMap = (Map<?, ?>) data;
@@ -44,6 +43,35 @@ public class ExcelExportServiceImpl implements IExcelExportService {
                     }
                 }
             }
+        }
+
+        // 第五步， 遍历所有列，计算最大宽度
+        for (int colNum = 0; colNum < headers.length; colNum++) {
+            // 设置单元格自适应宽度
+            int maxColumnWidth = 0;
+
+            for (int rowNum = 0; rowNum <= sheet.getLastRowNum(); rowNum++) {
+                Row row = sheet.getRow(rowNum);
+                if (row == null) continue;
+                Cell cell = row.getCell(colNum);
+                if (cell == null) continue;
+                // 使用Apache POI的自动宽度计算
+                int cellWidth = sheet.getColumnWidth(colNum) / 256; // 默认宽度，这里只是为了演示如何计算，实际不需要
+
+                // 假设我们使用单元格内容的字符串长度来估算宽度
+                // 注意：这里直接使用toString()可能不够准确，特别是对于数字、日期等类型的单元格
+                int length = cell.toString().length();
+                if (length * 256 > cellWidth) { // 假设每个字符大约占用256个单位宽度（这只是一个粗略的估计）
+                    cellWidth = (length) * 256;
+                }
+
+                // 但更好的做法是使用Apache POI的Sheet.autoSizeColumn(int column)方法
+                // 这里我们仍然计算，但只是为了展示如何遍历和计算
+                if (cellWidth > maxColumnWidth) {
+                    maxColumnWidth = cellWidth;
+                }
+            }
+            sheet.autoSizeColumn(colNum);
         }
 
         // 写入文件

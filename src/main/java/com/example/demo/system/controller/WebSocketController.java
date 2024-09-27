@@ -7,12 +7,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 @EnableScheduling
 @Component
 public class WebSocketController {
     //设置定时十秒一次
+    @PostConstruct
     @Scheduled(cron = "0 0/10 * * * ?")
     public String send() {
         JSONObject months = new JSONObject();

@@ -202,13 +202,13 @@ public class requestThirdPartyController {
     @ApiOperation(value = "抖音关键字搜索")
     @GetMapping("/tiktok/search/keyword")
     public Result searchKeywordVideo(String keyword) {
-        String url = "http://suggestion.baidu.com/su?wd=" + keyword;
+        String url = "https://www.baidu.com/sugrec?prod=pc&wd=" + keyword;
         JSONObject video = getWord(url);
 
-        if (video.getInteger("code") == 200) {
-            return Result.success(video.getJSONArray("data"));
+        if (video.getString("slid").isEmpty()) {
+            return Result.fail(50001, "搜索异常");
         }
-        return Result.fail(video.getString("msg"));
+        return Result.success(video.getJSONArray("g"));
     }
 
     @ApiOperation(value = "抖音搜索")
@@ -232,10 +232,10 @@ public class requestThirdPartyController {
     @ApiOperation(value = "漂亮小姐姐跳舞视频")
     @GetMapping("/beautiful/video")
     public Result getBeautifulWomanApi() {
-        String url = "https://tucdn.wpon.cn/api-girl/index.php?wpon=json";
+        String url = "https://api.pearktrue.cn/api/random/xjj/?type=json";
         JSONObject video = getWord(url);
-        if(video.getInteger("result").equals(200)) {
-            return Result.success(video.getString("mp4"));
+        if(video.getInteger("code").equals(200)) {
+            return Result.success(video.getString("video"), null);
         } else {
             return Result.fail(50000, "第三方接口有误");
         }
@@ -244,7 +244,7 @@ public class requestThirdPartyController {
     @ApiOperation(value = "解析抖音视频")
     @GetMapping("/tiktok/download")
     public Result analysisDouYinVideo(@RequestParam  String url) {
-        String video = "https://api.pearktrue.cn/api/video/douyin?url=" + url;
+        String video = "https://api.pearktrue.cn/api/video/api.php?url=" + url;
         JSONObject data = getWord(video);
         if (data.get("code").equals(200)) {
             JSONObject dat = data.getJSONObject("data");
