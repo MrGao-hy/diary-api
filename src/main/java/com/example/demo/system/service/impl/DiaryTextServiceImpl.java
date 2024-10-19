@@ -42,7 +42,7 @@ public class DiaryTextServiceImpl extends ServiceImpl<DiaryTextMapper, DiaryText
 
         LambdaUpdateWrapper<DiaryText> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(DiaryText::getUserId, userId).eq(DiaryText::getCreateDate, diaryText.getCreateDate());
-        Boolean isSave = saveOrUpdate(diaryText, updateWrapper);
+        boolean isSave = saveOrUpdate(diaryText, updateWrapper);
 
         if (!isSave) {
             return Result.fail("保存失败");

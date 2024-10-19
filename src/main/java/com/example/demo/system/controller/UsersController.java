@@ -27,12 +27,6 @@ public class UsersController {
     private IUsersService usersService;
 
     @ApiOperation(value = "注册用户")
-    @PostMapping("/list")
-    public Result getAll(@RequestBody PageRequest pageRequest) {
-        return usersService.getUserListService(new Page<Users>(pageRequest.getCurrent(), pageRequest.getSize()));
-    }
-
-    @ApiOperation(value = "注册用户")
     @PostMapping("/register")
     public Result setRegister(@RequestBody Users users) {
         return usersService.registerService(users);
@@ -64,6 +58,12 @@ public class UsersController {
     @PostMapping("/unsubscribe")
     public Result unsubscribe(@RequestBody Users users) {
         return usersService.unsubscribeService(users);
+    }
+
+    @ApiOperation(value = "查询所以用户")
+    @PostMapping("/list")
+    public Result getAll(@RequestBody PageRequest pageRequest) {
+        return usersService.getUserListService(new Page<Users>(pageRequest.getCurrent(), pageRequest.getSize()));
     }
 
     @ApiOperation(value = "条件搜索用户")

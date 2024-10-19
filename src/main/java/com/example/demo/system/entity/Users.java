@@ -6,11 +6,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.google.api.client.util.DateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,8 +29,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @TableName("d_users")
 @ApiModel(value = "Users对象", description = "用户信息表")
-public class
-Users implements Serializable {
+public class Users implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -60,7 +59,8 @@ Users implements Serializable {
     private String signature;
 
     @ApiModelProperty("出生日期")
-    private String birthDate;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private LocalDate birthDate;
 
     @ApiModelProperty("头像")
     private String avatar;

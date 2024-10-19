@@ -3,6 +3,7 @@ package com.example.demo.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.example.demo.common.vo.Result;
+import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.ApplyList;
 import com.example.demo.system.mapper.ApplyListMapper;
 import com.example.demo.system.service.IApplyListService;
@@ -28,8 +29,12 @@ public class ApplyListServiceImpl extends ServiceImpl<ApplyListMapper, ApplyList
      * */
     @Override
     public Result getApplyListService() {
-        List<ApplyList> applyLists = list();
-        return Result.success(applyLists);
+        try {
+            List<ApplyList> applyLists = list();
+            return Result.success(applyLists);
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(),StatusCode.SQL_STATUS_ERROR.getDescription() + e);
+        }
     }
 
     /**
@@ -37,11 +42,11 @@ public class ApplyListServiceImpl extends ServiceImpl<ApplyListMapper, ApplyList
      * */
     @Override
     public Result addApplyService(ApplyList applyList) {
-        Boolean isAdd = save(applyList);
+        boolean isAdd = save(applyList);
         if(isAdd) {
             return Result.success("创建成功");
         } else {
-            return Result.fail(50000, "创建失败");
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(),StatusCode.SQL_STATUS_ERROR.getDescription());
         }
     }
 
@@ -63,17 +68,17 @@ public class ApplyListServiceImpl extends ServiceImpl<ApplyListMapper, ApplyList
         } else {
             wrapper.set(ApplyList::getState, "正常");
         }
-        Boolean isUpdate = update(wrapper);
+        boolean isUpdate = update(wrapper);
         if(isUpdate) {
             return Result.success("更新成功");
         } else {
-            return Result.fail(20001,"更新失败");
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(),StatusCode.SQL_STATUS_ERROR.getDescription());
         }
     }
 
     @Override
     public Result deleteApplyService(List<String> ids) {
-        Boolean del = removeByIds(ids);
+        boolean del = removeByIds(ids);
         if(del) {
             return Result.success("删除成功");
         } else {

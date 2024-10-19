@@ -8,10 +8,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
 import com.example.demo.config.HostHolder;
-import com.example.demo.system.entity.Headers;
-import com.example.demo.system.entity.Role;
-import com.example.demo.system.entity.UserRole;
-import com.example.demo.system.entity.Users;
+import com.example.demo.enumClass.StatusCode;
+import com.example.demo.system.entity.*;
 import com.example.demo.system.mapper.UsersMapper;
 import com.example.demo.system.service.IExcelExportService;
 import com.example.demo.system.service.IUserRoleService;
@@ -25,7 +23,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 /**
@@ -64,7 +64,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         // 判断查询结果是否大于0，大于零说明有重复的名字
         if (count > 0) {
             // 是：表示用户名已被占用，则抛出UsernameDuplicateException异常
-            return Result.fail(20001, "尝试注册的用户名【" + username + "】或手机号【" + phone + "】已经被占用");
+            return Result.fail(StatusCode.REPETITION.getValue(), "尝试注册的用户名【" + username + "】或手机号【" + phone + "】已经被占用");
         }
 
         // 补全数据：加密后的密码
@@ -81,7 +81,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         // 判断受影响的行数是否不为1
         if (row1 != 1) {
             // 是：插入数据时出现某种错误，则抛出InsertException异常
-            return Result.fail(30001, "添加用户数据出现未知错误，请联系系统管理员");
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription());
         }
 
         // 查询该用户
@@ -120,7 +120,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         // 判断查询结果中的密码，与以上加密得到的密码是否不一致
         if (!result.getPassword().equals(md5Password)) {
             // 是：抛出异常
-            return Result.fail(30002, "密码错误");
+            return Result.fail(StatusCode.PASSWORD_ERR.getValue(), StatusCode.PASSWORD_ERR.getDescription());
         }
 
         // 生成token
@@ -155,15 +155,16 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
         Users data = getOne(wrapper);
         UserRole userRole = new UserRole();
-        userRole.setUserId(data.getId());
-        List<Role> roleList = userRoleService.queryRoleService(userRole);
-        data.setRoles(roleList);
 
         if (data != null) {
+            userRole.setUserId(data.getId());
+            List<Role> roleList = userRoleService.queryRoleService(userRole);
+            data.setRoles(roleList);
+            data.setSex(judgeSex(data.getSex()));
             return Result.success(data, "查询成功");
         }
 
-        return Result.fail(40002, "查询失败");
+        return Result.fail(StatusCode.NOT_DATA.getValue(), StatusCode.NOT_DATA.getDescription());
     }
 
     /**
@@ -198,7 +199,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
         boolean updateData = update(updateWrapper);
         if (!updateData) {
-            return Result.fail(30001, "修改用户数据出现未知错误，请联系系统管理员");
+            return Result.fail(StatusCode.NOT_DATA.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription());
         }
 
         return Result.success("修改成功");
@@ -240,6 +241,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             userRole.setUserId(item.getId());
             List<Role> roleList = userRoleService.queryRoleService(userRole);
             item.setRoles(roleList);
+            item.setSex(judgeSex(item.getSex()));
         }
         return Result.success(usersList, "查询成功");
     }
@@ -250,11 +252,19 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     public Result searchUserService(Users users) {
         LambdaQueryWrapper<Users> wrapper = new LambdaQueryWrapper<>();
 
+        // 搜索范围出生日期
+        if(users.getBirthDate() != null) {
+            LocalDate firstDayOfYear = users.getBirthDate().with(TemporalAdjusters.firstDayOfYear());
+            LocalDate lastDayOfYear = users.getBirthDate().with(TemporalAdjusters.lastDayOfYear());
+            wrapper.between(Users::getBirthDate, firstDayOfYear.getYear(),lastDayOfYear.atTime(23, 59, 59));
+        }
+
         wrapper.like(!StringUtils.isEmpty(users.getUserName()), Users::getUserName, users.getUserName());
         wrapper.like(!StringUtils.isEmpty(users.getPhone()), Users::getPhone, users.getPhone());
         wrapper.like(!StringUtils.isEmpty(users.getEmit()), Users::getEmit, users.getEmit());
         wrapper.like(!StringUtils.isEmpty(users.getIdCard()), Users::getIdCard, users.getIdCard());
         wrapper.eq(!StringUtils.isEmpty(users.getSex()), Users::getSex, users.getSex());
+        wrapper.eq(!StringUtils.isEmpty(users.getConstellation()), Users::getConstellation, users.getConstellation());
 
         List<Users> list = wrapper.isEmptyOfWhere() ? list(new QueryWrapper<>()) : list(wrapper);
 
@@ -263,6 +273,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             userRole.setUserId(item.getId());
             List<Role> roleList = userRoleService.queryRoleService(userRole);
             item.setRoles(roleList);
+            item.setSex(judgeSex(item.getSex()));
         }
         return Result.success(list, "查询成功");
     }
@@ -272,7 +283,6 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      * */
     public Result exportUserListService(HttpServletResponse response) {
 
-        LambdaQueryWrapper wrapper = new LambdaQueryWrapper();
         List<Users> lists = list();
         List<Map<String, Object>> dataList = new ArrayList<>();
 
@@ -336,15 +346,15 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         // 判断查询结果中的密码，与以上加密得到的密码是否不一致
         if (!user.getPassword().equals(md5Password)) {
             // 是：抛出异常
-            return Result.fail(30002, "密码错误");
+            return Result.fail(StatusCode.PASSWORD_ERR.getValue(), StatusCode.PASSWORD_ERR.getDescription());
         }
 
         // 新密码加密存起来
         String newPwd = getMd5Password(users.getPassword(), salt);
-        LambdaUpdateWrapper<Users> updateWrapper = new LambdaUpdateWrapper();
+        LambdaUpdateWrapper<Users> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Users::getId, userId);
         updateWrapper.set(Users::getPassword, newPwd);
-        Boolean result = update(updateWrapper);
+        boolean result = update(updateWrapper);
 
 
         // 更新token
@@ -360,7 +370,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         if (result) {
             return Result.success(data, "修改密码成功");
         } else {
-            return Result.fail("修改密码失败");
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription());
         }
     }
 
