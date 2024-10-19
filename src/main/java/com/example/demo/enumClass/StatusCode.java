@@ -1,5 +1,9 @@
 package com.example.demo.enumClass;
 
+import lombok.Data;
+import lombok.Getter;
+
+@Getter
 public enum StatusCode {
     //常量对象列表，必须在枚举类首行
     NOT_DATA(40001,"哥哥，您查询的数据不存在"),
@@ -20,11 +24,4 @@ public enum StatusCode {
         this.description = description;
     }
 
-    public int getValue() {
-        return value;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }

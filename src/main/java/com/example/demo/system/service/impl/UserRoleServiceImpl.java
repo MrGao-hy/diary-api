@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.demo.common.vo.Result;
 import com.example.demo.config.HostHolder;
+import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.DiaryText;
 import com.example.demo.system.entity.Role;
 import com.example.demo.system.entity.UserRole;
@@ -39,35 +40,36 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
      * 查询个人权限
      * */
     @Override
-    public Result queryUserRoleService() {
+    public Result<List<Role>> queryUserRoleService() {
 
         String userId = hostHolder.getUser().getId();
 
         LambdaQueryWrapper<UserRole> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(UserRole::getUserId, userId);
 
-        List<UserRole> limits = list(wrapper);
+        try {
+            List<UserRole> limits = list(wrapper);
 
-        List<Role> roleList = new ArrayList<>();
+            List<Role> roleList = new ArrayList<>();
+            for (UserRole userRole : limits) {
 
-        for (UserRole userRole : limits) {
+                LambdaQueryWrapper<Role> wrapper1 = Wrappers.lambdaQuery();
+                wrapper1.eq(Role::getId, userRole.getRoleId());
+                Role data = roleMapper.selectOne(wrapper1);
 
-            LambdaQueryWrapper<Role> wrapper1 = Wrappers.lambdaQuery();
-            wrapper1.eq(Role::getId, userRole.getRoleId());
-            Role data = roleMapper.selectOne(wrapper1);
-
-            roleList.add(data);
+                roleList.add(data);
+            }
+            return Result.success(roleList);
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
-
-
-        return Result.success(roleList);
     }
 
     /**
      * 绑定权限管理
      * */
     @Override
-    public Result bindRoleService(UserRole userRole) {
+    public Result<String> bindRoleService(UserRole userRole) {
 
         LambdaUpdateWrapper<UserRole> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(UserRole::getUserId, userRole.getUserId());
@@ -86,11 +88,15 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
             }
         }
 
-        Boolean isSave = saveBatch(list);
-        if(isSave) {
-            return Result.success("绑定成功");
-        } else {
-            return Result.success("绑定失败");
+        try {
+            boolean isSave = saveBatch(list);
+            if(isSave) {
+                return Result.success("绑定成功");
+            } else {
+                return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription());
+            }
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
     }
 
@@ -101,13 +107,18 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
         List<Role> roles = new ArrayList<>();
         LambdaUpdateWrapper<UserRole> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(UserRole::getUserId, userRole.getUserId());
-        List<UserRole> list = list(wrapper);
-        for (UserRole item : list) {
-            LambdaUpdateWrapper<Role> wrapper2 = new LambdaUpdateWrapper<>();
-            wrapper2.eq(Role::getId, item.getRoleId());
-            Role roleTemp = roleMapper.selectOne(wrapper2);
-            roles.add(roleTemp);
+
+        try {
+            List<UserRole> list = list(wrapper);
+            for (UserRole item : list) {
+                LambdaUpdateWrapper<Role> wrapper2 = new LambdaUpdateWrapper<>();
+                wrapper2.eq(Role::getId, item.getRoleId());
+                Role roleTemp = roleMapper.selectOne(wrapper2);
+                roles.add(roleTemp);
+            }
+            return roles;
+        } catch (Exception e) {
+            return roles;
         }
-        return roles;
     }
 }

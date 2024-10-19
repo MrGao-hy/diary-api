@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.demo.common.vo.Result;
 import com.example.demo.config.HostHolder;
+import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.DiaryText;
 import com.example.demo.system.mapper.DiaryTextMapper;
 import com.example.demo.system.service.IDiaryTextService;
@@ -36,7 +37,7 @@ public class DiaryTextServiceImpl extends ServiceImpl<DiaryTextMapper, DiaryText
      * 保存个人当天日记，重复就更新
      * */
     @Override
-    public Result saveDiaryService(DiaryText diaryText) {
+    public Result<String> saveDiaryService(DiaryText diaryText) {
         String userId = hostHolder.getUser().getId();
         diaryText.setUserId(userId);
 
@@ -54,21 +55,24 @@ public class DiaryTextServiceImpl extends ServiceImpl<DiaryTextMapper, DiaryText
      * 获取个人当天日记详情
      * */
     @Override
-    public Result getDiaryDetailService(DiaryText diaryText) {
+    public Result<DiaryText> getDiaryDetailService(DiaryText diaryText) {
         String userId = hostHolder.getUser().getId();
         LambdaQueryWrapper<DiaryText> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(DiaryText::getUserId, userId).eq(DiaryText::getCreateDate, diaryText.getCreateDate());
-        DiaryText data = getOne(queryWrapper);
 
-
-        return Result.success(data, "查询成功");
+        try {
+            DiaryText data = getOne(queryWrapper);
+            return Result.success(data, "查询成功");
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
+        }
     }
 
     /**
      * 获取个人当月所有日记时间
      * */
     @Override
-    public Result getDiaryListService(DiaryText diaryText) {
+    public Result<List<LocalDate>> getDiaryListService(DiaryText diaryText) {
         String userId = hostHolder.getUser().getId();
         LambdaQueryWrapper<DiaryText> queryWrapper = Wrappers.lambdaQuery();
 
@@ -76,22 +80,26 @@ public class DiaryTextServiceImpl extends ServiceImpl<DiaryTextMapper, DiaryText
         LocalDate lastDayOfMonth = diaryText.getCreateDate().with(TemporalAdjusters.lastDayOfMonth());
 
         queryWrapper.select(DiaryText::getCreateDate).eq(DiaryText::getUserId, userId).between(DiaryText::getCreateDate, firstDayOfMonth.atStartOfDay(),lastDayOfMonth.atTime(23, 59, 59));
-        List<DiaryText> data = list(queryWrapper);
 
-        List<LocalDate> timrList = new ArrayList<>();
-        for (int i = 0; i < data.size(); i++) {
-            LocalDate time = data.get(i).getCreateDate();
-            timrList.add(time);
+        try {
+            List<DiaryText> data = list(queryWrapper);
+            List<LocalDate> timrList = new ArrayList<>();
+            for (DiaryText datum : data) {
+                LocalDate time = datum.getCreateDate();
+                timrList.add(time);
+            }
+
+            return Result.success(timrList, "查询成功");
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
-
-        return Result.success(timrList, "查询成功");
     }
 
     /**
      * 获取个人所有日记加起来的积分
      * */
     @Override
-    public Result getAllIntegralService() {
+    public Result<Map<String, Object>> getAllIntegralService() {
         String userId = hostHolder.getUser().getId();
         LambdaQueryWrapper<DiaryText> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.select(DiaryText::getIntegral).eq(DiaryText::getUserId, userId);
@@ -99,8 +107,8 @@ public class DiaryTextServiceImpl extends ServiceImpl<DiaryTextMapper, DiaryText
 
         BigDecimal all = BigDecimal.ZERO;
         //Double all = 0.00;
-        for (int i = 0; i < list.size(); i++) {
-            BigDecimal integral = list.get(i).getIntegral();
+        for (DiaryText diaryText : list) {
+            BigDecimal integral = diaryText.getIntegral();
             all = all.add(integral);
             //all += integral;
         }

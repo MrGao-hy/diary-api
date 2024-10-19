@@ -28,7 +28,7 @@ public class ApplyListServiceImpl extends ServiceImpl<ApplyListMapper, ApplyList
      * 获取工具应用列表
      * */
     @Override
-    public Result getApplyListService() {
+    public Result<List<ApplyList>> getApplyListService() {
         try {
             List<ApplyList> applyLists = list();
             return Result.success(applyLists);
@@ -41,12 +41,15 @@ public class ApplyListServiceImpl extends ServiceImpl<ApplyListMapper, ApplyList
      * 添加工具应用
      * */
     @Override
-    public Result addApplyService(ApplyList applyList) {
-        boolean isAdd = save(applyList);
-        if(isAdd) {
-            return Result.success("创建成功");
-        } else {
+    public Result<String> addApplyService(ApplyList applyList) {
+        try {
+            boolean isAdd = save(applyList);
+            if(isAdd) {
+                return Result.success("创建成功");
+            }
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(),StatusCode.SQL_STATUS_ERROR.getDescription());
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
     }
 
@@ -54,7 +57,7 @@ public class ApplyListServiceImpl extends ServiceImpl<ApplyListMapper, ApplyList
      * 更新工具应用状态
      * */
     @Override
-    public Result changeApplyService(ApplyList applyList) {
+    public Result<String> changeApplyService(ApplyList applyList) {
         LambdaUpdateWrapper<ApplyList> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(ApplyList::getId, applyList.getId());
         // 插入想要修改的值
@@ -68,16 +71,19 @@ public class ApplyListServiceImpl extends ServiceImpl<ApplyListMapper, ApplyList
         } else {
             wrapper.set(ApplyList::getState, "正常");
         }
-        boolean isUpdate = update(wrapper);
-        if(isUpdate) {
-            return Result.success("更新成功");
-        } else {
+        try {
+            boolean isUpdate = update(wrapper);
+            if(isUpdate) {
+                return Result.success("更新成功");
+            }
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(),StatusCode.SQL_STATUS_ERROR.getDescription());
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
     }
 
     @Override
-    public Result deleteApplyService(List<String> ids) {
+    public Result<String> deleteApplyService(List<String> ids) {
         boolean del = removeByIds(ids);
         if(del) {
             return Result.success("删除成功");

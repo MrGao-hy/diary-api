@@ -10,6 +10,7 @@ import com.example.demo.common.vo.Result;
 import com.example.demo.config.ClassApiConfig;
 import com.example.demo.config.HostHolder;
 import com.example.demo.config.HttpClientConfig;
+import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.ClockImage;
 import com.example.demo.system.entity.Location;
 import com.example.demo.system.entity.UploadFile;
@@ -18,7 +19,6 @@ import com.example.demo.system.mapper.LocationMapper;
 import com.example.demo.system.mapper.UploadFileMapper;
 import com.example.demo.system.service.ILocationService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.demo.system.service.IUploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -57,7 +57,7 @@ public class LocationServiceImpl extends ServiceImpl<LocationMapper, Location> i
      * 地址逆编译
      * */
     @Override
-    public Result geocodeLocationService(Location location) {
+    public Result<Object> geocodeLocationService(Location location) {
         if (location == null) {
             return Result.fail("没有传参");
         }
@@ -78,44 +78,46 @@ public class LocationServiceImpl extends ServiceImpl<LocationMapper, Location> i
      * 打卡
      * */
     @Override
-    public Result punchLocationService(Location location) {
+    public Result<String> punchLocationService(Location location) {
         // 获取用户id
         String userId = hostHolder.getUser().getId();
         String username = hostHolder.getUser().getUserName();
         location.setUserId(userId);
         location.setAuthor(username);
-
         // 图片注入中间表
         List<Long> imgList = location.getImageId();
-        // 保存数据
-        Boolean bool = save(location);
 
-        for (Long id : imgList) {
-            ClockImage img = new ClockImage();
-            img.setImageId(id);
-            img.setClockInId(location.getId());
-            clockImageMapper.insert(img);
+        try {
+            // 保存数据
+            boolean bool = save(location);
+            for (Long id : imgList) {
+                ClockImage img = new ClockImage();
+                img.setImageId(id);
+                img.setClockInId(location.getId());
+                clockImageMapper.insert(img);
+            }
+            if (bool) {
+                return Result.success("打卡成功");
+            }
+            return Result.fail("打卡失败");
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
-
-        if (bool) {
-            return Result.success("打卡成功");
-        }
-        return Result.fail("打卡失败");
     }
 
     /**
      * 分页查询地址打卡列表
-     * */
+     */
     @Override
-    public Result punchLocationListService(Page<Location> page) {
+    public Result<Page<Location>> punchLocationListService(Page<Location> page) {
         // 获取用户id
         String userId = hostHolder.getUser().getId();
 
-        LambdaQueryWrapper<Location> queryWrapper = new LambdaQueryWrapper();
+        LambdaQueryWrapper<Location> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Location::getUserId, userId);
         queryWrapper.orderByDesc(Location::getCreateTime);
-        List<Location> datas = locationMapper.selectPage(page, queryWrapper).getRecords();
-        for (Location datum : datas) {
+        Page<Location> dataS = locationMapper.selectPage(page, queryWrapper);
+        for (Location datum : dataS.getRecords()) {
             LambdaQueryWrapper<ClockImage> wrapper = Wrappers.lambdaQuery();
             wrapper.eq(ClockImage::getClockInId, datum.getId());
             List<ClockImage> clockImages = clockImageMapper.selectList(wrapper);
@@ -129,14 +131,14 @@ public class LocationServiceImpl extends ServiceImpl<LocationMapper, Location> i
             List<String> collect1 = uploadFiles.stream().map(UploadFile::getUrl).collect(Collectors.toList());
             datum.setImageList(collect1);
         }
-        return Result.success(datas);
+        return Result.success(dataS);
     }
 
     /**
      * 删除打卡日记
      * */
     @Override
-    public Result punchLocationDeleteService(Location location) {
+    public Result<String> punchLocationDeleteService(Location location) {
         try {
             LambdaQueryWrapper<Location> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(Location::getId, location.getId());
@@ -185,7 +187,7 @@ public class LocationServiceImpl extends ServiceImpl<LocationMapper, Location> i
      * 搜索当天地址打卡
      * */
     @Override
-    public Result getLocationListService(Date date) {
+    public Result<List<Location>> getLocationListService(Date date) {
         String userId = hostHolder.getUser().getId();
         QueryWrapper<Location> queryWrapper = new QueryWrapper<>();
 

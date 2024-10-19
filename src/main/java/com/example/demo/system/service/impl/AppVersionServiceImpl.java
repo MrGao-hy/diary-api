@@ -2,6 +2,7 @@ package com.example.demo.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.demo.common.vo.Result;
+import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.AppVersion;
 import com.example.demo.system.mapper.AppVersionMapper;
 import com.example.demo.system.service.IExcelExportService;
@@ -35,12 +36,16 @@ public class AppVersionServiceImpl extends ServiceImpl<AppVersionMapper, AppVers
      * 检查app版本
      * */
     @Override
-    public Result queryAppVersionService() {
+    public Result<AppVersion> queryAppVersionService() {
 
         LambdaQueryWrapper<AppVersion> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByDesc(AppVersion::getUpdateTime);
-        AppVersion data = getOne(wrapper);
 
-        return Result.success(data);
+        try {
+            AppVersion data = getOne(wrapper);
+            return Result.success(data);
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
+        }
     };
 }

@@ -21,12 +21,11 @@ public class ProblemInfoServiceImpl extends ServiceImpl<ProblemInfoMapper, Probl
 
     /**
      * 反馈问题
-     * @param problemInfo
+     * @param problemInfo 集合
      * */
     @Override
-    public Result problemFeedbackService(ProblemInfo problemInfo) {
-//        LambdaQueryWrapper<ProblemInfo> wrapper = new LambdaQueryWrapper<>();
-        Boolean bool = save(problemInfo);
+    public Result<String> problemFeedbackService(ProblemInfo problemInfo) {
+        boolean bool = save(problemInfo);
         if(bool) {
             return Result.success("提交成功");
         }

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MountServiceImpl extends ServiceImpl<MountMapper, Mount> implements IMountService {
     @Override
-    public Result createMountService(Mount mount) {
+    public Result<String> createMountService(Mount mount) {
 
         if(mount.getName().isEmpty()) {
             return Result.fail(StatusCode.PARAM_NOT_NULL.getValue(), "【name】" + StatusCode.PARAM_NOT_NULL.getDescription());
@@ -50,7 +50,7 @@ public class MountServiceImpl extends ServiceImpl<MountMapper, Mount> implements
     }
 
     @Override
-    public Result queryMountListService(Page<Mount> page) {
+    public Result<Page<Mount>> queryMountListService(Page<Mount> page) {
 
         try {
             LambdaQueryWrapper<Mount> queryWrapper = new LambdaQueryWrapper<>();
@@ -65,7 +65,7 @@ public class MountServiceImpl extends ServiceImpl<MountMapper, Mount> implements
     }
 
     @Override
-    public Result queryMountDetailService(Mount mount) {
+    public Result<Mount> queryMountDetailService(Mount mount) {
 
         LambdaQueryWrapper<Mount> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Mount::getId, mount.getId());

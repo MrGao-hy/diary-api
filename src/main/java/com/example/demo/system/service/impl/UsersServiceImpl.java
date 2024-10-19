@@ -54,7 +54,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      * 注册用户
      * */
     @Override
-    public Result registerService(Users users) {
+    public Result<String> registerService(Users users) {
         String username = users.getUserName();
         String phone = users.getPhone();
         // 调用持久层的User findByUsername(String username)方法，根据用户名查询用户数据
@@ -100,7 +100,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      * 登录
      * */
     @Override
-    public Result loginService(Users users) {
+    public Result<Map<Object, String>> loginService(Users users) {
         String username = users.getUserName();
         String password = users.getPassword();
         Map<String, String> payload = new HashMap<>();
@@ -143,7 +143,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      * 个人用户信息详情
      * */
     @Override
-    public Result userInfoService(Users users) {
+    public Result<Users> userInfoService(Users users) {
         LambdaQueryWrapper<Users>  wrapper = new LambdaQueryWrapper<>();
 
         if (users.getId().isEmpty()) {
@@ -171,7 +171,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
      * 编辑个人用户信息
      * */
     @Override
-    public Result editInfoService(Users users) {
+    public Result<String> editInfoService(Users users) {
         // 设置需要更新的字段
         LambdaUpdateWrapper<Users> updateWrapper = new LambdaUpdateWrapper<>();
 
@@ -197,19 +197,23 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
 
 
-        boolean updateData = update(updateWrapper);
-        if (!updateData) {
-            return Result.fail(StatusCode.NOT_DATA.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription());
-        }
+        try {
+            boolean updateData = update(updateWrapper);
+            if (!updateData) {
+                return Result.fail(StatusCode.NOT_DATA.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription());
+            }
 
-        return Result.success("修改成功");
+            return Result.success("修改成功");
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
+        }
     }
 
     /**
      * 注销用户，目前只能删用户信息
      * */
     @Override
-    public Result unsubscribeService(Users users) {
+    public Result<String> unsubscribeService(Users users) {
         String userId = hostHolder.getUser().getId();
         LambdaQueryWrapper<Users> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(Users::getId, userId);
@@ -232,24 +236,29 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     /**
      * 分页查询所有用户信息
      * */
-    public Result getUserListService(Page<Users> page) {
+    public Result<Page<Users>> getUserListService(Page<Users> page) {
         LambdaQueryWrapper<Users> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByDesc(Users::getBirthDate);
-        Page<Users> usersList = page(page, wrapper);
-        for (Users item : usersList.getRecords()) {
-            UserRole userRole = new UserRole();
-            userRole.setUserId(item.getId());
-            List<Role> roleList = userRoleService.queryRoleService(userRole);
-            item.setRoles(roleList);
-            item.setSex(judgeSex(item.getSex()));
+
+        try {
+            Page<Users> usersList = page(page, wrapper);
+            for (Users item : usersList.getRecords()) {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(item.getId());
+                List<Role> roleList = userRoleService.queryRoleService(userRole);
+                item.setRoles(roleList);
+                item.setSex(judgeSex(item.getSex()));
+            }
+            return Result.success(usersList, "查询成功");
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
-        return Result.success(usersList, "查询成功");
     }
 
     /**
      * 搜索用户信息
      * */
-    public Result searchUserService(Users users) {
+    public Result<List<Users>> searchUserService(Users users) {
         LambdaQueryWrapper<Users> wrapper = new LambdaQueryWrapper<>();
 
         // 搜索范围出生日期
@@ -266,22 +275,26 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         wrapper.eq(!StringUtils.isEmpty(users.getSex()), Users::getSex, users.getSex());
         wrapper.eq(!StringUtils.isEmpty(users.getConstellation()), Users::getConstellation, users.getConstellation());
 
-        List<Users> list = wrapper.isEmptyOfWhere() ? list(new QueryWrapper<>()) : list(wrapper);
+        try {
+            List<Users> list = wrapper.isEmptyOfWhere() ? list(new QueryWrapper<>()) : list(wrapper);
 
-        for (Users item : list) {
-            UserRole userRole = new UserRole();
-            userRole.setUserId(item.getId());
-            List<Role> roleList = userRoleService.queryRoleService(userRole);
-            item.setRoles(roleList);
-            item.setSex(judgeSex(item.getSex()));
+            for (Users item : list) {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(item.getId());
+                List<Role> roleList = userRoleService.queryRoleService(userRole);
+                item.setRoles(roleList);
+                item.setSex(judgeSex(item.getSex()));
+            }
+            return Result.success(list, "查询成功");
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
-        return Result.success(list, "查询成功");
     }
 
     /**
      * 导出所有用户数据
      * */
-    public Result exportUserListService(HttpServletResponse response) {
+    public Result<String> exportUserListService(HttpServletResponse response) {
 
         List<Users> lists = list();
         List<Map<String, Object>> dataList = new ArrayList<>();
@@ -333,10 +346,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     /**
      * 修改用户密码
      * */
-    public Result changePasswordService(Users users) {
+    public Result<Map<String, String>> changePasswordService(Users users) {
         String userId = hostHolder.getUser().getId();
         LambdaQueryWrapper<Users> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(Users::getId, userId);
+
         Users user = getOne(wrapper);
 
         // 从查询结果中获取盐值
