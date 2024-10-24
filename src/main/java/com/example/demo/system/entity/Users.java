@@ -94,4 +94,34 @@ public class Users implements Serializable {
     @ApiModelProperty("旧密码")
     @TableField(exist = false)
     private String oldPassword;
+
+
+    @Data
+    public static class UserInfoVo {
+
+        public UserInfoVo(Users users){
+            this.id = users.id;
+            this.userName = users.userName;
+            this.phone = users.phone;
+            this.avatar = users.avatar;
+            this.sex = users.sex;
+        }
+
+        @ApiModelProperty("id")
+        @TableId(value = "id", type = IdType.ASSIGN_ID)
+        private String id;
+
+        @ApiModelProperty("用户名")
+        private String userName;
+
+        @ApiModelProperty("电话")
+        private String phone;
+
+        @ApiModelProperty("头像")
+        private String avatar;
+
+        @ApiModelProperty("性别")
+        private String sex;
+    }
 }
+

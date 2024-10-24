@@ -11,7 +11,8 @@ public enum StatusCode {
     NOT_FOUND_USER(20001, "用户不存在"),
     REPETITION(20002, "数据重复"),
     PASSWORD_ERR(40002, "密码错误"),
-    PARAM_NOT_NULL(20005, "参数不能为空")
+    PARAM_NOT_NULL(20005, "参数不能为空"),
+    USER_NOT_LOGIN(40004, "用户未登录")
     ;
 
     //建议枚举对象的属性也加final

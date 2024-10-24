@@ -16,9 +16,14 @@ import com.example.demo.system.entity.PageRequest;
  */
 public interface IMountService extends IService<Mount> {
 
-    Result createMountService(Mount mount);
+    Result<String> createMountService(Mount mount);
 
-    Result queryMountListService(Page<Mount> page);
+    Result<Page<Mount>> queryMountListService(Page<Mount> page);
 
-    Result queryMountDetailService(Mount mount);
+    Result<Mount> queryMountDetailService(Mount mount);
+
+    /**
+     * 查询收藏山接口
+     * */
+    Mount queryCollectMountService(Long id);
 }

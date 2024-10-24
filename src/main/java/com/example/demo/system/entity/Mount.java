@@ -1,6 +1,7 @@
 package com.example.demo.system.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
@@ -49,4 +50,12 @@ public class Mount implements Serializable {
 
     @ApiModelProperty("纬度")
     private BigDecimal latitude;
+
+    @ApiModelProperty("收藏数量")
+    @TableField(exist = false)
+    private Long markCount;
+
+    @ApiModelProperty("评论数量")
+    @TableField(exist = false)
+    private Long collectCount;
 }

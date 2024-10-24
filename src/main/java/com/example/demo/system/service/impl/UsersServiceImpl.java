@@ -167,6 +167,20 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return Result.fail(StatusCode.NOT_DATA.getValue(), StatusCode.NOT_DATA.getDescription());
     }
 
+    @Override
+    public Users.UserInfoVo queryUserInfoService(Users users) {
+
+        LambdaQueryWrapper<Users>  queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Users::getId, users.getId());
+
+        Users one = getOne(queryWrapper);
+        if (one != null) {
+            return new Users.UserInfoVo(one);
+        }
+
+        return null;
+    }
+
     /**
      * 编辑个人用户信息
      * */

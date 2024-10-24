@@ -29,19 +29,19 @@ public class MountController {
 
     @ApiOperation(value =  "创建名山数据")
     @PostMapping("create")
-    public Result createMountApi(@RequestBody Mount mount) {
+    public Result<String> createMountApi(@RequestBody Mount mount) {
         return mountService.createMountService(mount);
     }
 
     @ApiOperation(value =  "查询名山列表")
     @PostMapping("query/list")
-    public Result queryMountListApi(@RequestBody Page<Mount> page) {
+    public Result<Page<Mount>> queryMountListApi(@RequestBody Page<Mount> page) {
         return mountService.queryMountListService(page);
     }
 
     @ApiOperation(value =  "查询名山详情")
     @PostMapping("query/detail")
-    public Result queryMountDetailApi(@RequestBody Mount mount) {
+    public Result<Mount> queryMountDetailApi(@RequestBody Mount mount) {
         return mountService.queryMountDetailService(mount);
     }
 }

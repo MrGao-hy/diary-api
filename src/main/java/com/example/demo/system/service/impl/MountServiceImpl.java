@@ -6,11 +6,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
 import com.example.demo.enumClass.StatusCode;
-import com.example.demo.system.entity.DiaryText;
+import com.example.demo.system.entity.CollectMount;
+import com.example.demo.system.entity.MarkMount;
 import com.example.demo.system.entity.Mount;
+import com.example.demo.system.mapper.CollectMountMapper;
+import com.example.demo.system.mapper.MarkMountMapper;
 import com.example.demo.system.mapper.MountMapper;
 import com.example.demo.system.service.IMountService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +27,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MountServiceImpl extends ServiceImpl<MountMapper, Mount> implements IMountService {
+
+    @Autowired
+    private CollectMountMapper collectMountMapper;
+    @Autowired
+    private MarkMountMapper markMountMapper;
+
     @Override
     public Result<String> createMountService(Mount mount) {
 
@@ -82,5 +92,26 @@ public class MountServiceImpl extends ServiceImpl<MountMapper, Mount> implements
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
 
+    }
+
+    @Override
+    public Mount queryCollectMountService(Long id) {
+
+        try {
+            Mount mount = getById(id);
+            LambdaQueryWrapper<MarkMount> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(MarkMount::getMountId, id);
+            Long markCount =  markMountMapper.selectCount(queryWrapper);
+
+            LambdaQueryWrapper<CollectMount> queryCollectWrapper = new LambdaQueryWrapper<>();
+            queryCollectWrapper.eq(CollectMount::getMountId, id);
+            Long collectCount =  collectMountMapper.selectCount(queryCollectWrapper);
+
+            mount.setCollectCount(collectCount);
+            mount.setMarkCount(markCount);
+            return mount;
+        } catch (Exception e) {
+            return new Mount();
+        }
     }
 }

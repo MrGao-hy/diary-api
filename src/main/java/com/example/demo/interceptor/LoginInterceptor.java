@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.demo.common.vo.Result;
 import com.example.demo.config.HostHolder;
+import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.mapper.UsersMapper;
 import com.example.demo.utils.BeanUtil;
 import com.example.demo.utils.JWTUtils;
@@ -44,7 +45,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             final HostHolder hostHolder = BeanUtil.getBean(HostHolder.class);
             Users user = usersMapper.selectById(userId);
             if (user == null) {
-                authFailOutput(response, "用户不存在,或者已经注销了", 40001);
+                authFailOutput(response, "用户不存在,或者已经注销了", StatusCode.REPETITION.getValue());
                 return false;
             }
             hostHolder.setUser(user);
@@ -87,7 +88,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
-        out.write(objectMapper.writeValueAsString(Result.fail(40001, msg)));
+        out.write(objectMapper.writeValueAsString(Result.fail(StatusCode.USER_NOT_LOGIN.getValue(), msg)));
         out.flush();
     }
 

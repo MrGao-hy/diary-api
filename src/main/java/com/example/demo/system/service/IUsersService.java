@@ -2,12 +2,12 @@ package com.example.demo.system.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
-import com.example.demo.system.entity.Location;
 import com.example.demo.system.entity.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -22,32 +22,37 @@ public interface IUsersService extends IService<Users> {
     /**
      * 登录
      * */
-    Result loginService(Users users);
+    Result<Map<Object, String>> loginService(Users users);
 
     /**
      * 注册用户
      * */
-    Result registerService(Users users);
+    Result<String> registerService(Users users);
 
     /**
      * 个人用户信息
      * */
-    Result userInfoService(Users users);
+    Result<Users> userInfoService(Users users);
+
+    /**
+     * 根据用户id查询个人信息
+     * */
+    Users.UserInfoVo queryUserInfoService(Users users);
 
     /**
      * 编辑用户信息
      * */
-    Result editInfoService(Users users);
+    Result<String> editInfoService(Users users);
 
     /**
      * 注销账号
      * */
-    Result unsubscribeService(Users users);
+    Result<String> unsubscribeService(Users users);
 
     /**
      * 条件搜索用户
      * */
-    Result searchUserService(Users users);
+    Result<List<Users>> searchUserService(Users users);
 
     /**
      * 分页搜索所有用户信息
@@ -57,10 +62,10 @@ public interface IUsersService extends IService<Users> {
     /**
      * 导出所有用户数据
      * */
-    Result exportUserListService(HttpServletResponse response);
+    Result<String> exportUserListService(HttpServletResponse response);
 
     /**
      * 修改密码
      * */
-    Result changePasswordService(Users users);
+    Result<Map<String, String>> changePasswordService(Users users);
 }
