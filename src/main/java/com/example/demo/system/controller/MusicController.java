@@ -1,5 +1,6 @@
 package com.example.demo.system.controller;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.example.demo.common.vo.Result;
 import com.example.demo.config.ClassApiConfig;
@@ -28,7 +29,7 @@ public class MusicController {
 
     @ApiOperation(value = "热门歌单分类接口")
     @GetMapping("/hot/class")
-    public Result getHotClassApi() {
+    public Result<JSONArray> getHotClassApi() {
 
         String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getHot();
         JSONObject music = getWord(url);
@@ -41,7 +42,7 @@ public class MusicController {
 
     @ApiOperation(value = "歌单分类接口")
     @GetMapping("/class")
-    public Result getAllClassApi() {
+    public Result<JSONArray> getAllClassApi() {
 
         String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getClassify();
         JSONObject music = getWord(url);
@@ -54,7 +55,7 @@ public class MusicController {
 
     @ApiOperation(value = "歌单列表接口")
     @GetMapping("/song/list")
-    public Result getSongListApi(int id, int page, int size) {
+    public Result<JSONArray> getSongListApi(int id, int page, int size) {
 
         String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getList() + "?id=" + id + "&offset=" + (page - 1) * size + "&limit=" + size;
         JSONObject music = getWord(url);
@@ -67,7 +68,7 @@ public class MusicController {
 
     @ApiOperation(value = "判断歌曲能播放吗")
     @GetMapping("/song/can/play")
-    public Result judgeSongMp3CanPlayApi(int id) {
+    public Result<Boolean> judgeSongMp3CanPlayApi(int id) {
 
         String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getCanPlay() + "?id=" + id;
         JSONObject music = getWord(url);
@@ -80,7 +81,7 @@ public class MusicController {
 
     @ApiOperation(value = "获取歌曲url接口")
     @GetMapping("/song/mp3")
-    public Result getSongMp3Api(int id, String level) {
+    public Result<JSONArray> getSongMp3Api(int id, String level) {
 
         String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getMp3() + "?id=" + id + "&level=" + level;
         JSONObject music = getWord(url);
@@ -93,7 +94,7 @@ public class MusicController {
 
     @ApiOperation(value = "歌曲详情接口")
     @GetMapping("/song/detail")
-    public Result getSongDetailApi(int id) {
+    public Result<JSONArray> getSongDetailApi(int id) {
 
         String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getDetail() + "?ids=" + id;
         JSONObject music = getWord(url);
@@ -106,7 +107,7 @@ public class MusicController {
 
     @ApiOperation(value = "获取歌词接口")
     @GetMapping("/song/lyric")
-    public Result getSongLyricApi(int id) {
+    public Result<Object> getSongLyricApi(int id) {
 
         String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getLyric() + "?id=" + id;
         JSONObject music = getWord(url);
@@ -119,7 +120,7 @@ public class MusicController {
 
     @ApiOperation(value = "网易云搜索歌曲接口")
     @GetMapping("/search/song")
-    public Result searchMusicList(String keywords) {
+    public Result<Object> searchMusicList(String keywords) {
 
         String url = api.getNetEaseCloudMusicApi().getLocation().getHost() + api.getNetEaseCloudMusicApi().getLocation().getPath().getSearch() + "?keywords=" + keywords;
         JSONObject music = getWord(url);

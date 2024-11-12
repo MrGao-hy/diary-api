@@ -4,6 +4,8 @@ import com.example.demo.common.vo.Result;
 import com.example.demo.system.entity.Role;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -17,5 +19,5 @@ public interface IRoleService extends IService<Role> {
     /**
      * 查询权限列表
      * */
-    Result getRoleListService();
+    Result<List<Role>> getRoleListService();
 }

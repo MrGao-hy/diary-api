@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
+import com.example.demo.config.HostHolder;
 import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.CollectMount;
 import com.example.demo.system.entity.MarkMount;
@@ -32,6 +33,8 @@ public class MountServiceImpl extends ServiceImpl<MountMapper, Mount> implements
     private CollectMountMapper collectMountMapper;
     @Autowired
     private MarkMountMapper markMountMapper;
+    @Autowired
+    private HostHolder hostHolder;
 
     @Override
     public Result<String> createMountService(Mount mount) {
@@ -61,12 +64,29 @@ public class MountServiceImpl extends ServiceImpl<MountMapper, Mount> implements
 
     @Override
     public Result<Page<Mount>> queryMountListService(Page<Mount> page) {
+        // 用户id
+        String userId = hostHolder.getUser().getId();
+        LambdaQueryWrapper<Mount> queryWrapper = new LambdaQueryWrapper<>();
 
         try {
-            LambdaQueryWrapper<Mount> queryWrapper = new LambdaQueryWrapper<>();
 
             queryWrapper.orderByDesc(Mount::getAltitude);
             Page<Mount> mountList = page(page, queryWrapper);
+
+            for (Mount item : mountList.getRecords()) {
+                LambdaQueryWrapper<MarkMount> queryMarkWrapper = new LambdaQueryWrapper<>();
+                LambdaQueryWrapper<CollectMount> queryCollectWrapper = new LambdaQueryWrapper<>();
+                queryCollectWrapper.eq(CollectMount::getMountId, item.getId());
+                queryMarkWrapper.eq(MarkMount::getMountId, item.getId());
+                Long markCount =  markMountMapper.selectCount(queryMarkWrapper);
+                Long collectCount =  collectMountMapper.selectCount(queryCollectWrapper);
+                item.setMarkCount(markCount);
+                item.setCollectCount(collectCount);
+
+                queryCollectWrapper.eq(CollectMount::getUserId, userId);
+                boolean isCollect = collectMountMapper.exists(queryCollectWrapper);
+                item.setCollect(isCollect);
+            }
             return Result.success(mountList, "查询成功");
         } catch (Exception e) {
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
@@ -77,13 +97,29 @@ public class MountServiceImpl extends ServiceImpl<MountMapper, Mount> implements
     @Override
     public Result<Mount> queryMountDetailService(Mount mount) {
 
+        // 用户id
+        String userId = hostHolder.getUser().getId();
+
         LambdaQueryWrapper<Mount> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Mount::getId, mount.getId());
+        LambdaQueryWrapper<MarkMount> queryMarkWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<CollectMount> queryCollectWrapper = new LambdaQueryWrapper<>();
 
         try {
             Mount queryOne = getOne(queryWrapper);
 
             if(queryOne != null) {
+                queryCollectWrapper.eq(CollectMount::getMountId, queryOne.getId());
+                queryMarkWrapper.eq(MarkMount::getMountId, queryOne.getId());
+                Long markCount =  markMountMapper.selectCount(queryMarkWrapper);
+                Long collectCount =  collectMountMapper.selectCount(queryCollectWrapper);
+                queryOne.setMarkCount(markCount);
+                queryOne.setCollectCount(collectCount);
+
+                queryCollectWrapper.eq(CollectMount::getUserId, userId);
+                boolean isCollect = collectMountMapper.exists(queryCollectWrapper);
+                queryOne.setCollect(isCollect);
+
                 return Result.success(queryOne, "查询成功");
             } else {
                 return Result.fail(StatusCode.NOT_DATA.getValue(), StatusCode.NOT_DATA.getDescription());

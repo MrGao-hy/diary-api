@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -28,13 +29,13 @@ public class LocationController {
 
     @ApiOperation(value = "逆编码")
     @PostMapping("geocode")
-    public Result geocodeLocationApi(@RequestBody Location location) {
+    public Result<Object> geocodeLocationApi(@RequestBody Location location) {
         return locationService.geocodeLocationService(location);
     }
 
     @ApiOperation(value = "地点打卡")
     @PostMapping("punch")
-    public Result punchLocationApi(@RequestBody Location location) {
+    public Result<String> punchLocationApi(@RequestBody Location location) {
         return locationService.punchLocationService(location);
     }
 
@@ -46,12 +47,12 @@ public class LocationController {
 
     @ApiOperation(value = "删除地点打卡日志")
     @PostMapping("punch/delete")
-    public Result punchLocationDeleteApi(@RequestBody Location location) {
+    public Result<String> punchLocationDeleteApi(@RequestBody Location location) {
         return locationService.punchLocationDeleteService(location);
     }
 
     @GetMapping("list")
-    public Result getLocationListApi(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+    public Result<List<Location>> getLocationListApi(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         return locationService.getLocationListService(date);
     }
 }

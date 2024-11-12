@@ -1,5 +1,6 @@
 package com.example.demo.system.controller;
 
+import cn.hutool.db.Page;
 import com.example.demo.common.vo.Result;
 import com.example.demo.system.entity.CollectMount;
 import com.example.demo.system.entity.Mount;
@@ -39,10 +40,5 @@ public class CollectMountController {
         return collectMountService.queryIsCollectService(collectMount);
     }
 
-    @ApiOperation(value = "个人查询收藏景区列表")
-    @PostMapping("mount/list")
-    public Result<List<Mount>> queryIsCollectListApi(@RequestBody CollectMount collectMount) {
-        return collectMountService.queryIsCollectListService(collectMount);
-    }
 
 }

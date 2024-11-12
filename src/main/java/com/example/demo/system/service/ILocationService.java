@@ -1,14 +1,12 @@
 package com.example.demo.system.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
 import com.example.demo.system.entity.Location;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.time.LocalDate;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 
 /**
  * <p>
@@ -23,12 +21,12 @@ public interface ILocationService extends IService<Location> {
     /**
      * 地址逆编译
      * */
-    Result<?> geocodeLocationService(Location location);
+    Result<Object> geocodeLocationService(Location location);
 
     /**
      * 地址打卡
      * */
-    Result<?> punchLocationService(Location location);
+    Result<String> punchLocationService(Location location);
 
     /**
      * 分页查询地址打卡列表
@@ -38,10 +36,10 @@ public interface ILocationService extends IService<Location> {
     /**
      * 删除打卡日记
      * */
-    Result punchLocationDeleteService(Location location);
+    Result<String> punchLocationDeleteService(Location location);
 
     /**
      * 搜索当天地址打卡
      * */
-    Result<?> getLocationListService(Date date);
+    Result<List<Location>> getLocationListService(Date date);
 }

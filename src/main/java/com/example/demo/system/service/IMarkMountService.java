@@ -17,7 +17,18 @@ import java.util.List;
  */
 public interface IMarkMountService extends IService<MarkMount> {
 
+    /**
+     * 评语接口
+     * */
     Result<String> markMountService(MarkMount markMount);
 
+    /**
+     * 评语列表接口
+     * */
     Result<List<MarkMount>> commentListService(MarkMount markMount);
+
+    /**
+     * 删除评语接口
+     * */
+    Result<Boolean> deleteCommentService(MarkMount markMount);
 }

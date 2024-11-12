@@ -51,6 +51,15 @@ public class Mount implements Serializable {
     @ApiModelProperty("纬度")
     private BigDecimal latitude;
 
+    @ApiModelProperty("图片地址")
+    private String url;
+
+    @ApiModelProperty("背景图片二维码")
+    private String posterBgImageUrl;
+
+    @ApiModelProperty("分享二维码地址")
+    private String qrCode;
+
     @ApiModelProperty("收藏数量")
     @TableField(exist = false)
     private Long markCount;
@@ -58,4 +67,9 @@ public class Mount implements Serializable {
     @ApiModelProperty("评论数量")
     @TableField(exist = false)
     private Long collectCount;
+
+    @ApiModelProperty("是否收藏")
+    @TableField(exist = false)
+    private boolean isCollect;
+
 }

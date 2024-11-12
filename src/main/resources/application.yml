@@ -1,5 +1,7 @@
 server:
   port: 8080
+  servlet:
+    context-path: /ms
 spring:
   datasource:
     username: root
@@ -17,6 +19,11 @@ spring:
       max-file-size: 10MB
   main:
     allow-circular-references: true
+  mvc:
+    #添加静态资源路径拦截器
+    static-path-pattern: /**
+    resources:
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/,classpath:/public/,classpath:/itstyle/
 logging:
   level:
     com.example.demo: debug

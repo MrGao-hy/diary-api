@@ -11,6 +11,7 @@ import com.example.demo.system.service.IMarkMountService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.demo.system.service.IUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -59,6 +60,7 @@ public class MarkMountServiceImpl extends ServiceImpl<MarkMountMapper, MarkMount
     public Result<List<MarkMount>> commentListService(MarkMount markMount) {
         LambdaQueryWrapper<MarkMount> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(MarkMount::getMountId, markMount.getMountId());
+        queryWrapper.orderByDesc(MarkMount::getCreateTime);
 
         try {
             List<MarkMount> data = list(queryWrapper);
@@ -69,6 +71,30 @@ public class MarkMountServiceImpl extends ServiceImpl<MarkMountMapper, MarkMount
                 item.setUserInfo(userInfo);
             }
             return Result.success(data,"成功");
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
+        }
+    }
+
+    @Override
+    public Result<Boolean> deleteCommentService(MarkMount markMount) {
+        String userId = hostHolder.getUser().getId();
+        LambdaQueryWrapper<MarkMount> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(MarkMount::getId, markMount.getId());
+        MarkMount oneMark = getOne(queryWrapper);
+        if(!oneMark.getUserId().equals(userId)) {
+            return Result.fail(StatusCode.User_Not_Delete.getValue(), StatusCode.User_Not_Delete.getDescription());
+        }
+        queryWrapper.eq(MarkMount::getUserId, userId);
+
+        try {
+            boolean isDel = remove(queryWrapper);
+
+            if(isDel) {
+                return Result.success(true,"删除成功");
+            } else {
+                return Result.success(false,"删除失败");
+            }
         } catch (Exception e) {
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }

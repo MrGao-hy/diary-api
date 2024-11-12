@@ -52,6 +52,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         List<String> patterns = new ArrayList<String>();
         patterns.add("/user/login");
         patterns.add("/user/register");
+        patterns.add("/font/**");
         patterns.add("/");
         patterns.add("/request/**");
         patterns.add("/file/diary/**");

@@ -1,6 +1,7 @@
 package com.example.demo.system.controller;
 
 import com.example.demo.common.vo.Result;
+import com.example.demo.system.entity.Role;
 import com.example.demo.system.service.IRoleService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * <p>
@@ -25,7 +28,7 @@ public class RoleController {
 
     @ApiOperation(value = "权限列表")
     @GetMapping("/list")
-    public Result getRoleListApi() {
+    public Result<List<Role>> getRoleListApi() {
         return roleService.getRoleListService();
     }
 }

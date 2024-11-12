@@ -204,7 +204,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 .set(Users::getMajor, users.getMajor())
                 .set(Users::getSchool, users.getSchool())
                 .set(Users::getEducation, users.getEducation())
-                .set(Users::getSex, users.getSex())
+                .set(Users::getName, users.getName())
+                .set(Users::getSex, sexToNum(users.getSex()))
                 .set(Users::getAddress, users.getAddress())
                 .set(Users::getPhone, users.getPhone())
                 .set(Users::getSignature, users.getSignature());
@@ -322,6 +323,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             obj.put("signature", data.getSignature());
             obj.put("birthDate", data.getBirthDate());
             obj.put("avatar", data.getAvatar());
+            obj.put("name", data.getName());
             obj.put("sex", judgeSex(data.getSex()));
             obj.put("school", data.getSchool());
             obj.put("education", data.getEducation());
@@ -341,6 +343,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 new Headers("签名", "signature"),
                 new Headers("生日", "birthDate"),
                 new Headers("头像", "avatar"),
+                new Headers("真实名称", "name"),
                 new Headers("性别", "sex"),
                 new Headers("学校", "school"),
                 new Headers("学历", "education"),
@@ -428,6 +431,25 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 gender = "保密";
             } else {
                 gender = "未知";
+            }
+        } else {
+            gender = "未知"; // 或者你可以决定在这种情况下抛出异常或进行其他处理
+        }
+
+        return gender;
+    }
+
+    private String sexToNum(String name) {
+        String gender = null;
+        if (name != null) {
+            if (name.equals("女生")) {
+                gender = "0";
+            } else if (name.equals("男生")) { // 注意：这里假设"1"也是有效的字符串输入，但在实际性别编码中很少见
+                gender = "1";
+            } else if (name.equals("保密")) {
+                gender = "-1";
+            } else {
+                gender = "2";
             }
         } else {
             gender = "未知"; // 或者你可以决定在这种情况下抛出异常或进行其他处理

@@ -1,5 +1,6 @@
 package com.example.demo.system.controller;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.example.demo.common.vo.Result;
 import com.example.demo.config.ClassApiConfig;
@@ -33,7 +34,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "首页轮播图")
     @GetMapping("/swiper")
-    public Result getSwiperImage() {
+    public Result<List<Object>> getSwiperImage() {
         List<Object> dataList = new ArrayList<>();
         for (int i = 1; i < 3; i++) {
             JSONObject image1 = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getAcgimg() + "?type=json");
@@ -54,7 +55,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "每日一句段子")
     @GetMapping("/word")
-    public Result getInAWord() {
+    public Result<Map<String, Object>> getInAWord() {
         Map<String, Object> data = new HashMap<>();
 
         // 随机一句骚话
@@ -90,7 +91,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "摸鱼日记图片")
     @GetMapping("/calendar")
-    public Result getFishCalendar() {
+    public Result<List<Object>> getFishCalendar() {
         List<Object> dataList = new ArrayList<>();
         // 摸鱼人日历
         JSONObject fish = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getMoyu() + "?type=json");
@@ -105,21 +106,21 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "获取当前天气")
     @GetMapping("/weather")
-    public Result getWeatherApi(@RequestParam String city) {
+    public Result<JSONObject> getWeatherApi(@RequestParam String city) {
         JSONObject data = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getWeather() + "?city=" + city);
         return Result.success(data);
     }
 
     @ApiOperation(value = "获取美女海报")
     @GetMapping("/poster/bg")
-    public Result getMobileGirl() {
+    public Result<JSONObject> getMobileGirl() {
         JSONObject data = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getMobileGirl() + "?type=json");
         return Result.success(data);
     }
 
     @ApiOperation(value = "每日励志英语")
     @GetMapping("/english")
-    public Result dailyEnglishApi() {
+    public Result<Object> dailyEnglishApi() {
         JSONObject data = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getDailyEnglish());
         if(data.getBoolean("success")) {
             return Result.success(data.get("data"));
@@ -130,14 +131,14 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "中英翻译")
     @GetMapping("/translate")
-    public Result translateApi(@RequestParam String content) {
+    public Result<JSONObject> translateApi(@RequestParam String content) {
         JSONObject data = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getTranslate() + "?text=" + content);
         return Result.success(data);
     }
 
     @ApiOperation(value = "ai小姐姐聊天")
     @GetMapping("/ai")
-    public Result openAiApi(@RequestParam String content) {
+    public Result<Object> openAiApi(@RequestParam String content) {
         JSONObject data = getWord("https://api.linhun.vip/api/fflt?type=json&apiKey=0f6416363e85cdad31122c3170a44d59&name=" + content);
 
         if (data.getInteger("code").equals(200)) {
@@ -149,7 +150,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "懒洋洋视频")
     @GetMapping("/cover")
-    public Result coverSongApi() {
+    public Result<Map<String, Object>> coverSongApi() {
         Map<String, Object> data = new HashMap<>();
         // 懒洋洋翻唱
         String url = "http://api.treason.cn/API/nan.php";
@@ -162,7 +163,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "获取当天星座")
     @GetMapping("/constellation")
-    public Result getConstellationInfo(String type, String date) {
+    public Result<Object> getConstellationInfo(String type, String date) {
         // 星座运势
         String url = api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getHoroscope() + "?time=" + date + "&type=" + type;
         JSONObject constellation = getWord(url);
@@ -176,7 +177,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "抖音视频排行榜")
     @GetMapping("/tiktok")
-    public Result getTikTokList(String type, int current, int size) {
+    public Result<Object> getTikTokList(String type, int current, int size) {
 
         String url = "https://apis.juhe.cn/fapig/douyin/billboard?key=7002fe9fc4bb5e129204f87d92c2f395&size=" + size + "&offset=" + size * current + "&type=" + type;
         JSONObject video = getWord(url);
@@ -189,7 +190,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "抖音热榜")
     @GetMapping("/tiktok/host")
-    public Result tiktokHotVideo() {
+    public Result<Object> tiktokHotVideo() {
         String url = api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getTiktokHot();
         JSONObject data = getWord(url);
 
@@ -201,7 +202,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "抖音关键字搜索")
     @GetMapping("/tiktok/search/keyword")
-    public Result searchKeywordVideo(String keyword) {
+    public Result<JSONArray> searchKeywordVideo(String keyword) {
         String url = "https://www.baidu.com/sugrec?prod=pc&wd=" + keyword;
         JSONObject video = getWord(url);
 
@@ -213,7 +214,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "抖音搜索")
     @GetMapping("/tiktok/search")
-    public Result searchTikTokVideo(String value, Integer y, Integer n) {
+    public Result<Map<Object, String>> searchTikTokVideo(String value, Integer y, Integer n) {
 
         String url = "https://api.linhun.vip/api/ssdouyin?&apiKey=d98a1920fc89eced1ad4641c9ae08fc7&msg=" + value + "&y=" + y + "&n=" + n;
         JSONObject video = getWord(url);
@@ -231,7 +232,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "漂亮小姐姐跳舞视频")
     @GetMapping("/beautiful/video")
-    public Result getBeautifulWomanApi() {
+    public Result<String> getBeautifulWomanApi() {
         String url = "https://api.pearktrue.cn/api/random/xjj/?type=json";
         JSONObject video = getWord(url);
         if(video.getInteger("code").equals(200)) {
@@ -243,7 +244,7 @@ public class requestThirdPartyController {
 
     @ApiOperation(value = "解析抖音视频")
     @GetMapping("/tiktok/download")
-    public Result analysisDouYinVideo(@RequestParam  String url) {
+    public Result<JSONObject> analysisDouYinVideo(@RequestParam  String url) {
         String video = "https://api.pearktrue.cn/api/video/api.php?url=" + url;
         JSONObject data = getWord(video);
         if (data.get("code").equals(200)) {
@@ -257,7 +258,7 @@ public class requestThirdPartyController {
     /**
      * get请求封装，需要接口返回对象
      *
-     * @returns Object 返回对象格式
+     * @return Object 返回对象格式
      */
     public JSONObject getWord(String url) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();

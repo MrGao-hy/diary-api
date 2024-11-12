@@ -39,4 +39,10 @@ public class MarkMountController {
     public Result<List<MarkMount>> commentListApi(@RequestBody MarkMount markMount) {
         return markMountService.commentListService(markMount);
     }
+
+    @ApiOperation(value = "删除评论接口")
+    @PostMapping("comment/delete")
+    public Result<Boolean> deleteCommentApi(@RequestBody MarkMount markMount) {
+        return markMountService.deleteCommentService(markMount);
+    }
 }
