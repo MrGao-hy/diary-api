@@ -27,7 +27,7 @@ public class ApplyList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("唯一键")
+    @ApiModelProperty("应用id")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
@@ -38,7 +38,7 @@ public class ApplyList implements Serializable {
     @ApiModelProperty("是否关闭")
     private Integer isFinish;
 
-    @ApiModelProperty("创建时间")
+    @ApiModelProperty("开始时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate startDate;

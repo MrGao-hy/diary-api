@@ -7,6 +7,7 @@ import com.example.demo.config.HostHolder;
 import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.CollectMount;
 import com.example.demo.system.entity.Mount;
+import com.example.demo.system.entity.MountainRecord;
 import com.example.demo.system.mapper.CollectMountMapper;
 import com.example.demo.system.service.ICollectMountService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -81,21 +82,21 @@ public class CollectMountServiceImpl extends ServiceImpl<CollectMountMapper, Col
     }
 
     @Override
-    public Result<List<Mount>> queryIsCollectListService(CollectMount collectMount) {
+    public Result<Page<Mount>> queryIsCollectListService(Page<CollectMount> page) {
         String userId = hostHolder.getUser().getId();
-
         LambdaQueryWrapper<CollectMount> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(CollectMount::getUserId, userId);
+        Page<Mount> list = new Page<>();
+        List<Mount> mountList = new ArrayList<>();
 
         try {
-            List<CollectMount> collectList = list(queryWrapper);
-            List<Mount> list = new ArrayList<>();
+            Page<CollectMount> collectList = page(page, queryWrapper);
 
-            for (CollectMount item : collectList) {
-                Mount data = mountService.queryCollectMountService(item.getMountId());
-                list.add(data);
+            for (CollectMount item : collectList.getRecords()) {
+                Mount mount = mountService.queryCollectMountService(item.getMountId());
+                mountList.add(mount);
             }
-            return Result.success(list);
+            return Result.success(list.setRecords(mountList));
         } catch (Exception e) {
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }

@@ -1,7 +1,7 @@
 package com.example.demo.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
 import com.example.demo.config.HostHolder;
 import com.example.demo.enumClass.StatusCode;
@@ -9,11 +9,14 @@ import com.example.demo.system.entity.Mount;
 import com.example.demo.system.entity.MountainRecord;
 import com.example.demo.system.mapper.MountMapper;
 import com.example.demo.system.mapper.MountainRecordMapper;
+import com.example.demo.system.service.IMountService;
 import com.example.demo.system.service.IMountainRecordService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -30,6 +33,8 @@ public class MountainRecordServiceImpl extends ServiceImpl<MountainRecordMapper,
     private MountMapper mountMapper;
     @Autowired
     private HostHolder hostHolder;
+    @Autowired
+    private IMountService mountService;
 
     @Override
     public Result<String> recordTravelService(MountainRecord mountainRecord) {
@@ -56,6 +61,26 @@ public class MountainRecordServiceImpl extends ServiceImpl<MountainRecordMapper,
             } else {
                 return Result.fail("不在打卡范围以内，请到景区附近点打卡");
             }
+        } catch (Exception e) {
+            return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
+        }
+    }
+
+    @Override
+    public Result<Page<Mount>> recordListService(Page<MountainRecord> page) {
+        String userId = hostHolder.getUser().getId();
+        LambdaQueryWrapper<MountainRecord> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(MountainRecord::getUserId, userId);
+        Page<Mount> list = new Page<>();
+        List<Mount> mountList = new ArrayList<>();
+        try {
+            Page<MountainRecord> RecordMountList = page(page, queryWrapper);
+            for (MountainRecord item : RecordMountList.getRecords()) {
+                Mount mount = mountService.queryCollectMountService(item.getMountId());
+                mountList.add(mount);
+            }
+            list.setRecords(mountList);
+            return Result.success(list);
         } catch (Exception e) {
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }

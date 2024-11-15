@@ -132,17 +132,24 @@ public class MountServiceImpl extends ServiceImpl<MountMapper, Mount> implements
 
     @Override
     public Mount queryCollectMountService(Long id) {
+        String userId = hostHolder.getUser().getId();
+        LambdaQueryWrapper<MarkMount> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<CollectMount> queryCollectWrapper = new LambdaQueryWrapper<>();
 
         try {
+            // 查询景区
             Mount mount = getById(id);
-            LambdaQueryWrapper<MarkMount> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(MarkMount::getMountId, id);
             Long markCount =  markMountMapper.selectCount(queryWrapper);
 
-            LambdaQueryWrapper<CollectMount> queryCollectWrapper = new LambdaQueryWrapper<>();
+            // 查询收藏人数
             queryCollectWrapper.eq(CollectMount::getMountId, id);
             Long collectCount =  collectMountMapper.selectCount(queryCollectWrapper);
+            // 查询本人是否收藏
+            queryCollectWrapper.eq(CollectMount::getUserId, userId);
+            boolean isCollect = collectMountMapper.exists(queryCollectWrapper);
 
+            mount.setCollect(isCollect);
             mount.setCollectCount(collectCount);
             mount.setMarkCount(markCount);
             return mount;

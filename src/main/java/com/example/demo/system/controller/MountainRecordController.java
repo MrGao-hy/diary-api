@@ -1,6 +1,8 @@
 package com.example.demo.system.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
+import com.example.demo.system.entity.Mount;
 import com.example.demo.system.entity.MountainRecord;
 import com.example.demo.system.service.IMountainRecordService;
 import io.swagger.annotations.ApiOperation;
@@ -31,10 +33,10 @@ public class MountainRecordController {
         return mountainRecordService.recordTravelService(mountainRecord);
     }
 
-    @ApiOperation(value =  "打卡")
+    @ApiOperation(value =  "我的足迹列表")
     @PostMapping("record/list")
-    public Result<String> recordListApi(@RequestBody MountainRecord mountainRecord) {
-        return mountainRecordService.recordListService(mountainRecord);
+    public Result<Page<Mount>> recordListApi(@RequestBody Page<MountainRecord> page) {
+        return mountainRecordService.recordListService(page);
     }
 
 }

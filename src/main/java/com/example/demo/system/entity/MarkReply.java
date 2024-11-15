@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -21,45 +19,35 @@ import lombok.Data;
  * </p>
  *
  * @author gaoxianhua
- * @since 2024-10-22
+ * @since 2024-11-14
  */
 @Data
-@TableName("d_mark_mount")
-@ApiModel(value = "MarkMount对象", description = "")
-public class MarkMount implements Serializable {
+@TableName("d_mark_reply")
+@ApiModel(value = "MarkReply对象", description = "")
+public class MarkReply implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("评论id")
+    @ApiModelProperty("回复id")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
 
+    @ApiModelProperty("评论id")
+    private Long markId;
+
     @ApiModelProperty("用户id")
     private String userId;
 
-    @ApiModelProperty("景区id")
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private Long mountId;
-
-    @ApiModelProperty("评语")
-    private String comment;
+    @ApiModelProperty("回复内容")
+    private String content;
 
     @ApiModelProperty("创建时间")
     private LocalDateTime createTime;
-
-    @ApiModelProperty("打分")
-    private Double mark;
 
     @ApiModelProperty("用户详情")
     @TableField(exist = false)
     private Users.UserInfoVo userInfo;
 
-    @ApiModelProperty("总回复条数")
-    @TableField(exist = false)
-    private Long allReply;
-
-    public MarkMount() {
-        this.createTime = LocalDateTime.now(ZoneId.systemDefault());
-    }
+    public MarkReply() { this.createTime = LocalDateTime.now(ZoneId.systemDefault()); }
 }

@@ -1,8 +1,10 @@
 package com.example.demo.system.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
 import com.example.demo.system.entity.CollectMount;
 import com.example.demo.system.entity.Mount;
+import com.example.demo.system.entity.MountainRecord;
 import com.example.demo.system.service.ICollectMountService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +43,8 @@ public class CollectMountController {
 
     @ApiOperation(value = "个人查询收藏景区列表")
     @PostMapping("mount/list")
-    public Result<List<Mount>> queryIsCollectListApi(@RequestBody CollectMount collectMount) {
-        return collectMountService.queryIsCollectListService(collectMount);
+    public Result<Page<Mount>> queryIsCollectListApi(@RequestBody Page<CollectMount> page) {
+        return collectMountService.queryIsCollectListService(page);
     }
 
 }

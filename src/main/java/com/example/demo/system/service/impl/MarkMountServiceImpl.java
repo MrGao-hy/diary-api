@@ -5,8 +5,10 @@ import com.example.demo.common.vo.Result;
 import com.example.demo.config.HostHolder;
 import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.MarkMount;
+import com.example.demo.system.entity.MarkReply;
 import com.example.demo.system.entity.Users;
 import com.example.demo.system.mapper.MarkMountMapper;
+import com.example.demo.system.mapper.MarkReplyMapper;
 import com.example.demo.system.service.IMarkMountService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.demo.system.service.IUsersService;
@@ -32,6 +34,8 @@ public class MarkMountServiceImpl extends ServiceImpl<MarkMountMapper, MarkMount
     private HostHolder hostHolder;
     @Autowired
     private IUsersService usersService;
+    @Autowired
+    private MarkReplyMapper markReplyMapper;
 
     @Override
     public Result<String> markMountService(MarkMount markMount) {
@@ -67,8 +71,13 @@ public class MarkMountServiceImpl extends ServiceImpl<MarkMountMapper, MarkMount
             Users users = new Users();
 
             for (MarkMount item : data) {
+                LambdaQueryWrapper<MarkReply> queryMarkWrapper = new LambdaQueryWrapper<>();
+                queryMarkWrapper.eq(MarkReply::getMarkId, item.getId());
+
                 Users.UserInfoVo userInfo = usersService.queryUserInfoService(users.setId(item.getUserId()));
+                Long count = markReplyMapper.selectCount(queryMarkWrapper);
                 item.setUserInfo(userInfo);
+                item.setAllReply(count);
             }
             return Result.success(data,"成功");
         } catch (Exception e) {
