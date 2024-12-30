@@ -32,6 +32,7 @@ public class DiaryText implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("id")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
@@ -45,7 +46,7 @@ public class DiaryText implements Serializable {
     private String plan;
 
     @ApiModelProperty("积分")
-    private BigDecimal integral;
+    private int integral;
 
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd")

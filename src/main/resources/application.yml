@@ -91,6 +91,7 @@ http:
         tiktokHot: /api/hotlist/douyinHot
         mobileGirl: /api/wallpaper/mobileGirl
         dailyEnglish: /api/dailyEnglish
+        ip: /api/ipInfo
 #web:
 #  resources:
 #    static-locations:file: D:\file

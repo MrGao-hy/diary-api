@@ -18,7 +18,7 @@ public class Codegenerator {
         String mapperLocation = "E:\\project\\java\\demo1\\src\\main\\resources\\mapper\\" + moduleName;
         String tableName = "d_users,d_role,d_upload_file,d_diary_text,d_location,d_clock_image,d_user_role," +
                 "d_app_version,d_problem_info,d_apply_list,d_mount,d_collect_mount,d_mark_mount,d_mountain_record," +
-                "d_mark_reply";
+                "d_mark_reply,d_integral_record";
         String tablePrefix = "d_";
         FastAutoGenerator.create(url, username, password)
                 .globalConfig(builder -> {

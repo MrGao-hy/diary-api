@@ -6,11 +6,14 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.demo.common.vo.Result;
 import com.example.demo.config.HostHolder;
+import com.example.demo.enumClass.IntegralType;
 import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.DiaryText;
+import com.example.demo.system.entity.IntegralRecord;
 import com.example.demo.system.mapper.DiaryTextMapper;
 import com.example.demo.system.service.IDiaryTextService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.demo.system.service.IIntegralRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +35,8 @@ public class DiaryTextServiceImpl extends ServiceImpl<DiaryTextMapper, DiaryText
 
     @Autowired
     private HostHolder hostHolder;
+    @Autowired
+    private IIntegralRecordService integralRecordService;
 
     /**
      * 保存个人当天日记，重复就更新
@@ -43,7 +48,17 @@ public class DiaryTextServiceImpl extends ServiceImpl<DiaryTextMapper, DiaryText
 
         LambdaUpdateWrapper<DiaryText> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper.eq(DiaryText::getUserId, userId).eq(DiaryText::getCreateDate, diaryText.getCreateDate());
+
+        DiaryText data = getOne(updateWrapper);
         boolean isSave = saveOrUpdate(diaryText, updateWrapper);
+        if(data == null) {
+            IntegralRecord integralRecord = new IntegralRecord();
+            integralRecord.setRemark(IntegralType.GET_DIARY_INTEGRAL);
+            integralRecord.setActiveId(diaryText.getId().toString());
+            integralRecord.setIntegral(diaryText.getIntegral());
+            integralRecord.setType(IntegralType.GET.getValue());
+            integralRecordService.saveIntegralRecordService(integralRecord);
+        }
 
         if (!isSave) {
             return Result.fail("保存失败");
@@ -93,31 +108,5 @@ public class DiaryTextServiceImpl extends ServiceImpl<DiaryTextMapper, DiaryText
         } catch (Exception e) {
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
-    }
-
-    /**
-     * 获取个人所有日记加起来的积分
-     * */
-    @Override
-    public Result<Map<String, Object>> getAllIntegralService() {
-        String userId = hostHolder.getUser().getId();
-        LambdaQueryWrapper<DiaryText> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.select(DiaryText::getIntegral).eq(DiaryText::getUserId, userId);
-        List<DiaryText> list = list(queryWrapper);
-
-        BigDecimal all = BigDecimal.ZERO;
-        //Double all = 0.00;
-        for (DiaryText diaryText : list) {
-            BigDecimal integral = diaryText.getIntegral();
-            all = all.add(integral);
-            //all += integral;
-        }
-        BigDecimal money = all.multiply(new BigDecimal("0.01"));
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("integral", all);
-        data.put("dayNum", list.size());
-        data.put("money", money);
-        return Result.success(data);
     }
 }

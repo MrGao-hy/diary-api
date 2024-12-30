@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.system.mapper.IntegralRecordMapper">
+    <!-- 计算总和，0减，1加 -->
+    <select id="calculateTotal" resultType="int">
+        SELECT COALESCE(SUM(CASE
+                       WHEN type = 1 THEN -integral
+                       WHEN type = 0 THEN integral
+                       ELSE 0
+            END), 0)
+        FROM d_integral_record WHERE user_id = #{userId}
+    </select>
+
+    <!-- 查询今天所有数据中，type 为 1 的 value 总和 -->
+    <select id="getTodayValueSum" resultType="int">
+        SELECT COALESCE(SUM(integral))
+        FROM d_integral_record
+        WHERE type = #{type} AND user_id = #{userId}
+          AND DATE(create_time) = CURDATE()
+    </select>
+</mapper>

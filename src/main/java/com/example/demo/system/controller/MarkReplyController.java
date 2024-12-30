@@ -29,7 +29,7 @@ public class MarkReplyController {
 
     @ApiOperation(value = "回复评论")
     @PostMapping("/reply")
-    public Result<String> markReplyApi(@RequestBody MarkReply markReply) {
+    public Result<MarkReply> markReplyApi(@RequestBody MarkReply markReply) {
 
         return markReplyService.markReplyService(markReply);
     }
@@ -38,6 +38,13 @@ public class MarkReplyController {
     @PostMapping("/reply/list")
     public Result<Page<MarkReply>> markReplyListApi(@RequestBody PageRequest<MarkReply> param) {
         return markReplyService.markReplyListService(param);
+    }
+
+    @ApiOperation(value = "删除回复")
+    @PostMapping("/reply/delete")
+    public Result<Boolean> deleteMarkReplyApi(@RequestBody MarkReply markReply) {
+
+        return markReplyService.deleteMarkReplyService(markReply);
     }
 
 }

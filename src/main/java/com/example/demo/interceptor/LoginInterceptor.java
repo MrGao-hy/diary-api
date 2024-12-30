@@ -45,7 +45,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             final HostHolder hostHolder = BeanUtil.getBean(HostHolder.class);
             Users user = usersMapper.selectById(userId);
             if (user == null) {
-                authFailOutput(response, "用户不存在,或者已经注销了", StatusCode.REPETITION.getValue());
+                authFailOutput(response, "用户不存在,或者已经注销了", StatusCode.USER_NOT_REGISTER.getValue());
                 return false;
             }
             hostHolder.setUser(user);

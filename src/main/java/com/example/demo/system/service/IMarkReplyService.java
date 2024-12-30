@@ -18,5 +18,7 @@ public interface IMarkReplyService extends IService<MarkReply> {
 
     Result<Page<MarkReply>> markReplyListService(PageRequest<MarkReply> param);
 
-    Result<String> markReplyService(MarkReply markReply);
+    Result<MarkReply> markReplyService(MarkReply markReply);
+
+    Result<Boolean> deleteMarkReplyService(MarkReply markReply);
 }

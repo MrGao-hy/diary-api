@@ -53,6 +53,16 @@ public class requestThirdPartyController {
         return Result.success(dataList);
     }
 
+    @ApiOperation(value = "定位ip地址")
+    @GetMapping("/ip")
+    public Result<Map<String, Object>> getIp() {
+        Map<String, Object> data = new HashMap<>();
+
+        // 随机一句骚话
+        JSONObject word1 = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getIp());
+        return Result.success(word1);
+    }
+
     @ApiOperation(value = "每日一句段子")
     @GetMapping("/word")
     public Result<Map<String, Object>> getInAWord() {
@@ -133,6 +143,13 @@ public class requestThirdPartyController {
     @GetMapping("/translate")
     public Result<JSONObject> translateApi(@RequestParam String content) {
         JSONObject data = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getTranslate() + "?text=" + content);
+        return Result.success(data);
+    }
+
+    @ApiOperation(value = "生成二维码")
+    @GetMapping("/qrCode")
+    public Result<JSONObject> qrCodeApi(@RequestParam String content) {
+        JSONObject data = getWord(api.getHxhApi().getLocation().getHost() + api.getHxhApi().getLocation().getPath().getQrcode() + "?text=" + content);
         return Result.success(data);
     }
 

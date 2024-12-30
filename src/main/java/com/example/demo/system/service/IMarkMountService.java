@@ -1,9 +1,10 @@
 package com.example.demo.system.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
-import com.example.demo.system.entity.CollectMount;
 import com.example.demo.system.entity.MarkMount;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.demo.system.entity.PageRequest;
 
 import java.util.List;
 
@@ -20,12 +21,12 @@ public interface IMarkMountService extends IService<MarkMount> {
     /**
      * 评语接口
      * */
-    Result<String> markMountService(MarkMount markMount);
+    Result<MarkMount> markMountService(MarkMount markMount);
 
     /**
      * 评语列表接口
      * */
-    Result<List<MarkMount>> commentListService(MarkMount markMount);
+    Result<Page<MarkMount>> commentListService(PageRequest<MarkMount> param);
 
     /**
      * 删除评语接口

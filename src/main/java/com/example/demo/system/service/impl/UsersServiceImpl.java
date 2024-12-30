@@ -109,7 +109,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
         Users result = usersMapper.selectOne(wrapper);
         if (result == null) {
-            return Result.fail(30001, "用户不存在");
+            return Result.fail(StatusCode.USER_NOT_REGISTER.getValue(), StatusCode.USER_NOT_REGISTER.getDescription());
         }
 
 

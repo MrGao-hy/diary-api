@@ -7,6 +7,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 /**
  * <p>
  * 每日日记内容 前端控制器
@@ -24,25 +27,19 @@ public class DiaryTextController {
 
     @ApiOperation(value = "保存签到打卡")
     @PostMapping("/save")
-    public Result saveDiary(@RequestBody DiaryText diaryText) {
+    public Result<String> saveDiary(@RequestBody DiaryText diaryText) {
         return diaryTextService.saveDiaryService(diaryText);
     }
 
     @ApiOperation(value = "签到详情")
     @PostMapping("/detail")
-    public Result getDiaryDetail(@RequestBody DiaryText diaryText) {
+    public Result<DiaryText> getDiaryDetail(@RequestBody DiaryText diaryText) {
         return diaryTextService.getDiaryDetailService(diaryText);
     }
 
     @ApiOperation(value = "打卡日期")
     @PostMapping("/month/list")
-    public Result getDiaryList(@RequestBody DiaryText diaryText) {
+    public Result<List<LocalDate>> getDiaryList(@RequestBody DiaryText diaryText) {
         return diaryTextService.getDiaryListService(diaryText);
-    }
-
-    @ApiOperation(value = "查询全部打卡")
-    @GetMapping("/integral/all")
-    public Result getAllIntegral() {
-        return diaryTextService.getAllIntegralService();
     }
 }

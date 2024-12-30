@@ -85,6 +85,7 @@ public class CollectMountServiceImpl extends ServiceImpl<CollectMountMapper, Col
     public Result<Page<Mount>> queryIsCollectListService(Page<CollectMount> page) {
         String userId = hostHolder.getUser().getId();
         LambdaQueryWrapper<CollectMount> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(CollectMount::getId);
         queryWrapper.eq(CollectMount::getUserId, userId);
         Page<Mount> list = new Page<>();
         List<Mount> mountList = new ArrayList<>();

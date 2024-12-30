@@ -1,8 +1,11 @@
 package com.example.demo.system.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
 import com.example.demo.system.entity.CollectMount;
 import com.example.demo.system.entity.MarkMount;
+import com.example.demo.system.entity.MarkReply;
+import com.example.demo.system.entity.PageRequest;
 import com.example.demo.system.service.ICollectMountService;
 import com.example.demo.system.service.IMarkMountService;
 import io.swagger.annotations.ApiOperation;
@@ -30,14 +33,14 @@ public class MarkMountController {
 
     @ApiOperation(value = "景区评价接口")
     @PostMapping("mount")
-    public Result<String> markMountApi(@RequestBody MarkMount markMount) {
+    public Result<MarkMount> markMountApi(@RequestBody MarkMount markMount) {
         return markMountService.markMountService(markMount);
     }
 
     @ApiOperation(value = "景区下评价列表接口")
     @PostMapping("comment/list")
-    public Result<List<MarkMount>> commentListApi(@RequestBody MarkMount markMount) {
-        return markMountService.commentListService(markMount);
+    public Result<Page<MarkMount>> commentListApi(@RequestBody PageRequest<MarkMount> param) {
+        return markMountService.commentListService(param);
     }
 
     @ApiOperation(value = "删除评论接口")

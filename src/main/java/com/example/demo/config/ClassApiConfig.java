@@ -60,6 +60,7 @@ public class ClassApiConfig {
         private String tiktokHot;
         private String mobileGirl;
         private String dailyEnglish;
+        private String ip;
 
         private String musicList;
         private String classify;

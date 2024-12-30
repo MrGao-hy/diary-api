@@ -40,6 +40,9 @@ public class Users implements Serializable {
     @ApiModelProperty("用户名")
     private String userName;
 
+    @ApiModelProperty("真实名称")
+    private String name;
+
     @ApiModelProperty("身份证号")
     private String idCard;
 
@@ -64,9 +67,6 @@ public class Users implements Serializable {
 
     @ApiModelProperty("头像")
     private String avatar;
-
-    @ApiModelProperty("真实名称")
-    private String name;
 
     @ApiModelProperty("性别")
     private String sex;

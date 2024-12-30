@@ -1,11 +1,16 @@
 package com.example.demo.system.service.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.vo.Result;
+import com.example.demo.config.ClassApiConfig;
 import com.example.demo.config.HostHolder;
+import com.example.demo.config.HttpClientConfig;
 import com.example.demo.enumClass.StatusCode;
 import com.example.demo.system.entity.MarkMount;
 import com.example.demo.system.entity.MarkReply;
+import com.example.demo.system.entity.PageRequest;
 import com.example.demo.system.entity.Users;
 import com.example.demo.system.mapper.MarkMountMapper;
 import com.example.demo.system.mapper.MarkReplyMapper;
@@ -15,6 +20,8 @@ import com.example.demo.system.service.IUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +45,7 @@ public class MarkMountServiceImpl extends ServiceImpl<MarkMountMapper, MarkMount
     private MarkReplyMapper markReplyMapper;
 
     @Override
-    public Result<String> markMountService(MarkMount markMount) {
+    public Result<MarkMount> markMountService(MarkMount markMount) {
         String userId = hostHolder.getUser().getId();
 
         if (markMount.getMountId() == null){
@@ -50,10 +57,9 @@ public class MarkMountServiceImpl extends ServiceImpl<MarkMountMapper, MarkMount
 
 
         try {
-
             markMount.setUserId(userId);
             save(markMount);
-            return Result.success("评语成功");
+            return Result.success(markMount);
         } catch (Exception e) {
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
@@ -61,16 +67,16 @@ public class MarkMountServiceImpl extends ServiceImpl<MarkMountMapper, MarkMount
     }
 
     @Override
-    public Result<List<MarkMount>> commentListService(MarkMount markMount) {
+    public Result<Page<MarkMount>> commentListService(PageRequest<MarkMount> param) {
         LambdaQueryWrapper<MarkMount> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(MarkMount::getMountId, markMount.getMountId());
+        queryWrapper.eq(MarkMount::getMountId, param.getIn().getMountId());
         queryWrapper.orderByDesc(MarkMount::getCreateTime);
 
         try {
-            List<MarkMount> data = list(queryWrapper);
+            Page<MarkMount> list = page(param, queryWrapper);
             Users users = new Users();
 
-            for (MarkMount item : data) {
+            for (MarkMount item : list.getRecords()) {
                 LambdaQueryWrapper<MarkReply> queryMarkWrapper = new LambdaQueryWrapper<>();
                 queryMarkWrapper.eq(MarkReply::getMarkId, item.getId());
 
@@ -79,7 +85,7 @@ public class MarkMountServiceImpl extends ServiceImpl<MarkMountMapper, MarkMount
                 item.setUserInfo(userInfo);
                 item.setAllReply(count);
             }
-            return Result.success(data,"成功");
+            return Result.success(list,"成功");
         } catch (Exception e) {
             return Result.fail(StatusCode.SQL_STATUS_ERROR.getValue(), StatusCode.SQL_STATUS_ERROR.getDescription() + e);
         }
@@ -92,7 +98,7 @@ public class MarkMountServiceImpl extends ServiceImpl<MarkMountMapper, MarkMount
         queryWrapper.eq(MarkMount::getId, markMount.getId());
         MarkMount oneMark = getOne(queryWrapper);
         if(!oneMark.getUserId().equals(userId)) {
-            return Result.fail(StatusCode.User_Not_Delete.getValue(), StatusCode.User_Not_Delete.getDescription());
+            return Result.fail(StatusCode.USER_NOT_DELETE.getValue(), StatusCode.USER_NOT_DELETE.getDescription());
         }
         queryWrapper.eq(MarkMount::getUserId, userId);
 

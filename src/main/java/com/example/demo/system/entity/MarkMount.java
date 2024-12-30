@@ -51,6 +51,12 @@ public class MarkMount implements Serializable {
     @ApiModelProperty("打分")
     private Double mark;
 
+    @ApiModelProperty("省")
+    private String province;
+
+    @ApiModelProperty("城市")
+    private String city;
+
     @ApiModelProperty("用户详情")
     @TableField(exist = false)
     private Users.UserInfoVo userInfo;
