@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import java.util.Collections;
 
 public class Codegenerator {
+
     public static void main(String[] args) {
         String url = "jdbc:mysql://localhost:3306/diary";
         String username = "root";
