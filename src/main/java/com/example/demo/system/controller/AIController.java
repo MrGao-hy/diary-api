@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.xml.bind.DatatypeConverter;
+import java.util.HexFormat;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
@@ -79,7 +79,7 @@ public class AIController {
             byte[] secretDate = HS256Util.hmac256(("TC3" + SECRET_KEY).getBytes(HS256Util.UTF8), date);
             byte[] secretService = HS256Util.hmac256(secretDate, service);
             byte[] secretSigning = HS256Util.hmac256(secretService, "tc3_request");
-            String signature = DatatypeConverter.printHexBinary(HS256Util.hmac256(secretSigning, stringToSign)).toLowerCase();
+            String signature = HexFormat.of().formatHex(HS256Util.hmac256(secretSigning, stringToSign));
 
             // ************* 步骤 4：拼接 Authorization *************
             String authorization = algorithm + " " + "Credential=" + SECRET_ID + "/" + credentialScope + ", "
@@ -172,7 +172,7 @@ public class AIController {
             byte[] secretDate = HS256Util.hmac256(("TC3" + SECRET_KEY).getBytes(HS256Util.UTF8), date);
             byte[] secretService = HS256Util.hmac256(secretDate, service);
             byte[] secretSigning = HS256Util.hmac256(secretService, "tc3_request");
-            String signature = DatatypeConverter.printHexBinary(HS256Util.hmac256(secretSigning, stringToSign)).toLowerCase();
+            String signature = HexFormat.of().formatHex(HS256Util.hmac256(secretSigning, stringToSign));
 
             // ************* 步骤 4：拼接 Authorization *************
             String authorization = algorithm + " " + "Credential=" + SECRET_ID + "/" + credentialScope + ", "
@@ -271,7 +271,7 @@ public class AIController {
             byte[] secretDate = HS256Util.hmac256(("TC3" + SECRET_KEY).getBytes(HS256Util.UTF8), date);
             byte[] secretService = HS256Util.hmac256(secretDate, service);
             byte[] secretSigning = HS256Util.hmac256(secretService, "tc3_request");
-            String signature = DatatypeConverter.printHexBinary(HS256Util.hmac256(secretSigning, stringToSign)).toLowerCase();
+            String signature = HexFormat.of().formatHex(HS256Util.hmac256(secretSigning, stringToSign));
 
             // ************* 步骤 4：拼接 Authorization *************
             String authorization = algorithm + " " + "Credential=" + SECRET_ID + "/" + credentialScope + ", "
@@ -369,7 +369,7 @@ public class AIController {
             byte[] secretDate = HS256Util.hmac256(("TC3" + SECRET_KEY).getBytes(HS256Util.UTF8), date);
             byte[] secretService = HS256Util.hmac256(secretDate, service);
             byte[] secretSigning = HS256Util.hmac256(secretService, "tc3_request");
-            String signature = DatatypeConverter.printHexBinary(HS256Util.hmac256(secretSigning, stringToSign)).toLowerCase();
+            String signature = HexFormat.of().formatHex(HS256Util.hmac256(secretSigning, stringToSign));
 
             // ************* 步骤 4：拼接 Authorization *************
             String authorization = algorithm + " " + "Credential=" + SECRET_ID + "/" + credentialScope + ", "

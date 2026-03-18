@@ -17,8 +17,8 @@ import org.apache.ibatis.annotations.Options;
 
 @Mapper
 public interface UsersMapper extends BaseMapper<Users> {
-    @Insert("INSERT INTO d_users(`user_name`, `password`, `createTime`, `phone`, `emit`, `salt`, `birth_date`, `avatar`, `age`, `sex`, `constellation`, `signature`, `integral`) " +
-            "VALUES(#{userName},#{password},#{createTime},#{phone},#{emit},#{salt},#{birthDate},#{avatar},#{age},#{sex},#{constellation},#{signature},#{integral})")
+    @Insert("INSERT INTO d_users(`user_name`, `password`, `createTime`, `phone`, `email`, `salt`, `birth_date`, `avatarId`, `age`, `sex`, `constellation`, `signature`, `integral`) " +
+            "VALUES(#{userName},#{password},#{createTime},#{phone},#{email},#{salt},#{birthDate},#{avatarId},#{age},#{sex},#{constellation},#{signature},#{integral})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     Long insertReturnId(Users users);
 

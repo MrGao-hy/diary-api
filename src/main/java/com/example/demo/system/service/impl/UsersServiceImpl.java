@@ -197,8 +197,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         }
         updateWrapper.set(Users::getUserName, users.getUserName())
                 .set(Users::getIdCard, users.getIdCard())
-                .set(Users::getAvatar, users.getAvatar())
-                .set(Users::getEmit, users.getEmit())
+                .set(Users::getAvatarId, users.getAvatarId())
+                .set(Users::getEmail, users.getEmail())
                 .set(Users::getConstellation, users.getConstellation())
                 .set(Users::getBirthDate, users.getBirthDate())
                 .set(Users::getMajor, users.getMajor())
@@ -285,7 +285,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
         wrapper.like(!StringUtils.isEmpty(users.getUserName()), Users::getUserName, users.getUserName());
         wrapper.like(!StringUtils.isEmpty(users.getPhone()), Users::getPhone, users.getPhone());
-        wrapper.like(!StringUtils.isEmpty(users.getEmit()), Users::getEmit, users.getEmit());
+        wrapper.like(!StringUtils.isEmpty(users.getEmail()), Users::getEmail, users.getEmail());
         wrapper.like(!StringUtils.isEmpty(users.getIdCard()), Users::getIdCard, users.getIdCard());
         wrapper.eq(!StringUtils.isEmpty(users.getSex()), Users::getSex, users.getSex());
         wrapper.eq(!StringUtils.isEmpty(users.getConstellation()), Users::getConstellation, users.getConstellation());
@@ -319,10 +319,10 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
             obj.put("userName", data.getUserName());
             obj.put("idCard", data.getIdCard());
             obj.put("phone", data.getPhone());
-            obj.put("emit", data.getEmit());
+            obj.put("email", data.getEmail());
             obj.put("signature", data.getSignature());
             obj.put("birthDate", data.getBirthDate());
-            obj.put("avatar", data.getAvatar());
+            obj.put("avatarId", data.getAvatarId());
             obj.put("name", data.getName());
             obj.put("sex", judgeSex(data.getSex()));
             obj.put("school", data.getSchool());
@@ -339,10 +339,10 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
                 new Headers("名称", "userName"),
                 new Headers("身份证号", "idCard"),
                 new Headers("手机号", "phone"),
-                new Headers("邮箱", "emit"),
+                new Headers("邮箱", "email"),
                 new Headers("签名", "signature"),
                 new Headers("生日", "birthDate"),
-                new Headers("头像", "avatar"),
+                new Headers("头像id", "avatarId"),
                 new Headers("真实名称", "name"),
                 new Headers("性别", "sex"),
                 new Headers("学校", "school"),

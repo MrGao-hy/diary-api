@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
+import java.util.HexFormat;
 
 public class HmacSha256Utils {
     private final static Charset UTF8 = StandardCharsets.UTF_8;
@@ -19,6 +19,6 @@ public class HmacSha256Utils {
     public static String sha256Hex(String s) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] d = md.digest(s.getBytes(UTF8));
-        return DatatypeConverter.printHexBinary(d).toLowerCase();
+        return HexFormat.of().formatHex(d);
     }
 }

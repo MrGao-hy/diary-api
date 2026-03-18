@@ -1,7 +1,7 @@
 package com.example.demo.utils;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
+import java.util.HexFormat;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -19,6 +19,6 @@ public class HS256Util {
     public static String sha256Hex(String s) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] d = md.digest(s.getBytes(UTF8));
-        return DatatypeConverter.printHexBinary(d).toLowerCase();
+        return HexFormat.of().formatHex(d);
     }
 }

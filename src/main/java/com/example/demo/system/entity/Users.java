@@ -53,7 +53,7 @@ public class Users implements Serializable {
     private String phone;
 
     @ApiModelProperty("邮箱")
-    private String emit;
+    private String email;
 
     @ApiModelProperty("盐值")
     private String salt;
@@ -65,8 +65,8 @@ public class Users implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDate birthDate;
 
-    @ApiModelProperty("头像")
-    private String avatar;
+    @ApiModelProperty("头像id")
+    private String avatarId;
 
     @ApiModelProperty("性别")
     private String sex;
@@ -106,7 +106,7 @@ public class Users implements Serializable {
             this.id = users.id;
             this.userName = users.userName;
             this.phone = users.phone;
-            this.avatar = users.avatar;
+            this.avatarId = users.avatarId;
             this.sex = users.sex;
         }
 
@@ -120,8 +120,8 @@ public class Users implements Serializable {
         @ApiModelProperty("电话")
         private String phone;
 
-        @ApiModelProperty("头像")
-        private String avatar;
+        @ApiModelProperty("头像id")
+        private String avatarId;
 
         @ApiModelProperty("性别")
         private String sex;
